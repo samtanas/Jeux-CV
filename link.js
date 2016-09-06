@@ -2,29 +2,34 @@
 window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 var cancelAnimationFrame = window.cancelAnimationFrame || window.mozCancelAnimationFrame;
 window.addEventListener('DOMContentLoaded', function(){
-  background.divJeux = document.getElementById('view');
-  background.zone = document.getElementById('background');
-  background.creatImage(0);
-  background.creatImage2();
-  linkAction.divPersonnage = document.getElementById('limitePersonnage').style; // div de déplacement du personnage
-  linkAction.divPersonnage.top = '34px';
+  myBackground.divJeux = document.getElementById('view');
+  myBackground.zone = document.getElementById('background');
+  myBackground.creatImage(0);
+  // div de la limite du personnage pour les collision
+  linkAction.divPersonnage = document.getElementById('limitePersonnage').style;
+	linkAction.divPersonnage.top = '34px';
   linkAction.divPersonnage.left = '73px';
   linkAction.divPersonnage.width = '14px';
   linkAction.divPersonnage.height = '16px';
-  linkAction.persoShow = document.getElementById('show').style; // image visible
-  linkAction.persoShow['z-index'] = 2; // image visible
-  linkAction.linkSprite = document.getElementById('spriteLink'); // positionnement du sprite
+  // image visible du personnage
+  linkAction.persoShow = document.getElementById('show').style;
+  // positionnement du sprite
+  linkAction.linkSprite = document.getElementById('spriteLink');
   linkEtat.actionOff.sprite = linkAction.spriteLink[1][2][0][3];
-  background.item = document.getElementById('objet').style; // div des objet
-  background.item['z-index'] = -1; // invisible
-  background.item.height = '16px';
-  background.item.width = '16px';
-  background.skill = document.getElementById('skill').style; // div des objet
-  background.skill['z-index'] = -1; // invisible
-  background.skill.height = '16px';
-  background.skill.width = '16px';
-  background.spriteObjet = document.getElementById('spriteObjet').style; // div des objet
-  background.spriteObjet['z-index'] = -1; // invisible
+  // div des objet
+  myBackground.item = document.getElementById('objet').style;
+  // image des objet
+  myBackground.spriteObjet = document.getElementById('spriteObjet').style;
+  // div de l'ombre
+  myBackground.shadow = document.getElementById('shadow').style;
+  // image de l'ombre
+  document.getElementById('spriteShadow').style.top = '-22px';
+  document.getElementById('spriteShadow').style.left = '-1081px';
+  // div des caractéristique
+  linkEtat.carac = document.getElementById('carac').style;
+  //création des caractéistique affiché
+  linkAction.creatCarac();
+  linkAction.menu();
 
   //mouvement du personnage
   window.requestAnimationFrame(function(timestamp){linkAction.mouvement(timestamp)});

@@ -2,12 +2,15 @@
 //personage
 var linkEtat = {
   item : {
-    shield : false, //
+    shield : true, //
     sword : true, //
     blueChainMail : false, //
     redChainMail : false, //
     bow : false, //
-    bomb : false //
+    bomb : false,
+    glove : true,
+    heart4 : false,
+    heart5 : false
   },
   key : {
     mongoDB : false,
@@ -15,7 +18,7 @@ var linkEtat = {
     angular : false,
     nodeJS : false
   },
-  life : 4,
+  life : [4, 4, 4, 0, 0],
   //bouleen des touche appuyé
   touche : {
     direction : 'E',
@@ -51,16 +54,16 @@ var linkEtat = {
   spriteMouvement : false,
   tailleSprite : 0,//calcul quand le scaleX et de -1
   slachSword : 0,
+  axieSword : null,
+  sensSword : null,
   actionOff : { //sans action
     sprite : null,//position du sprite
-    action : 0,
-    direction : 0,
-    position : 0
   },
   spritePosition : {//valeur quand on appuy sur une touche
     position : 0, //valeur du sprite par defaut
     color : 1,//couleur de la tenu
     direction : 2,//direction de link
     action : 0 //type d'action
-  }
+  },
+  chestOpen : [[],[],[],[],[],[],[],[],[],[],[]]//liste des coffre ouvert
 };

@@ -1,11 +1,24 @@
 //constructeur de position
-var ConstructOfPosition = function(px, py, tx, ty, aO, it, eW, cC){
-  this.positionX = px;
-  this.positionY = py;
-  this.tailleX = tx;
-  this.tailleY = ty;
-  this.actionObjet = aO || {chest : false, lift : false};//objet interactif et son type d'interaction
-  this.item = it || 0;
-  this.exitWay = eW || {boul : false};//sens de la sortie ou undefined quand ce n'est pas une sortie
-  this.chestContent = cC || undefined;//fonction contenu du coffre
-};
+
+var cP = (function(){
+  // déclaration de fonction constructeur
+  var ConstructOfPosition = function(positionX, positionY, tailleX, tailleY, argument){
+    this.positionX = positionX;
+    this.positionY = positionY;
+    this.tailleX = tailleX;
+    this.tailleY = tailleY;
+    this.argument = argument || {};
+    var exist = true;
+    this.existance = function(){ //getter => permet de récupérer la propriété "privée" exist
+        return exist;
+    };
+    this.modif = function(ex){ //setter => permet de définir le contenu de la propriété "privée" exist
+      exist = ex;
+    }
+  };
+
+  return function(px, py, tx, ty, arg){
+    // création d'un nouvel objet avec la fonction constructeur
+    return new ConstructOfPosition(px, py, tx, ty, arg);
+  }
+})()
