@@ -1,146 +1,8 @@
 'use stric'
 var linkAction = {
 
-
-  // //test des objet dans l'espace.
-  // testObstacle : function( mouvementWay /* left ou top */, boul, /* vérifi avec un bouleen si le sens est positif ou négatif */ div,/* div à vérifier */ link,/* bouleen qui vérifi si c'est la div de link ou un ennemis si c'est null */ indice/* indice de l'ennemi */, collision /* vérifi le type de collision */ ){
-  //   // valeur de l'objet et de la div dans l'axe oposé au mouvement pour savoir si il es aux dessus ou en dessous
-  //   var divPosition; // position de la div
-  //   var divSize; /* hauteur ou largeur */
-  //   var objectPosition; /* x ou y */
-  //   var objectSize; /* hauteur ou l'argeur */
-  //
-  //   // valeur dans le sens du mouvement
-  //   var divSizeSameAxis; // taille de la div dans le sens du mouvement
-  //   var objectPositionSameAxis; // taille de la div
-  //   var objectSizeSameAxis; /* hauteur ou l'argeur */
-  //
-  //   //initialisation des valeur
-  //   if (mouvementWay == 'left'){
-  //     divPosition = 'top';
-  //     divSize = 'height';
-  //     objectPosition = 'positionY';
-  //     objectSize = 'tailleY';
-  //     divSizeSameAxis = 'width';
-  //     objectPositionSameAxis = 'positionX';
-  //     objectSizeSameAxis = 'tailleX';
-  //   } else {
-  //     divPosition = 'left';
-  //     divSize = 'width';
-  //     objectPosition = 'positionX';
-  //     objectSize = 'tailleX';
-  //     divSizeSameAxis = 'height';
-  //     objectPositionSameAxis = 'positionY';
-  //     objectSizeSameAxis = 'tailleY';
-  //   }
-  //   var collisionType = collision || myBackground.collisionListe;
-  //   //boucle l'ensemble des objet
-  //   for (var i=0;collisionType[myBackground.stage][i];i++){
-  //     //vérifi que l'objet est toujours présent
-  //     if ( collisionType[myBackground.stage][i] && collisionType[myBackground.stage][i].existance() ){
-  //       //test si l'objet n'est pas au dessus ou en dessous ou a gauche ou a droite suivant le sens.
-  //       if ( !(parseFloat(div[divPosition]) + parseFloat(div[divSize]) <= collisionType[myBackground.stage][i][objectPosition] || parseFloat(div[divPosition]) >=  collisionType[myBackground.stage][i][objectPosition] + collisionType[myBackground.stage][i][objectSize]) ) {
-  //         if (boul){
-  //           // test si le sens positif du mouvement n'est pas inférieur au premier point d'impact de l'objet ou bien qu'il n'a pas dépassé le bord oposé
-  //           if( !( ( parseFloat(div[mouvementWay]) + parseFloat(div[divSizeSameAxis]) < collisionType[myBackground.stage][i][objectPositionSameAxis] ) || ( parseFloat(div[mouvementWay]) >= ( collisionType[myBackground.stage][i][objectPositionSameAxis] + collisionType[myBackground.stage][i][objectSizeSameAxis] ) ) ) )
-  //           {
-  //             if(link){
-  //               if ( collisionType === myBackground.collisionListe ){
-  //                 //renvoie l'objet touché
-  //                 if ( linkEtat.slachSword == 1 || linkEtat.slachSword == 4 ){
-  //                   linkEtat.touche.keyZPlusObstacle = true;
-  //                   //numéro de l'objet dans le tableau
-  //                   linkEtat.collision.position = i;
-  //                 } else {
-  //                   //colition avec l'épée chargé
-  //                   if ( linkEtat.slachSword == 3 ){
-  //                     //annule le coup d'épée
-  //                     linkEtat.slachSword = 0;
-  //                     //fait disparaitre le scintillement
-  //                     myBackground.item['z-index'] = -1;
-  //                   } else {
-  //                     linkEtat.collision.collisionBooleen = false;
-  //                     //numéro de l'objet dans le tableau
-  //                     linkEtat.collision.position = i;
-  //                   }
-  //                 }
-  //               } else {
-  //                 //vérifi si un coup d'épée est en cour
-  //                 if ( linkEtat.slachSword ){
-  //                   //diminu la vie de l'ennemi
-  //                   myBackground.enemiesStage[myBackground.stage][i].argument.life--;
-  //                   myBackground.enemiesStage[myBackground.stage][i].argument.touche = true;
-  //                 } else {
-  //                   this.touche(myBackground.enemiesStage[myBackground.stage][i].argument.damage);
-  //                   linkEtat.touch = true;
-  //                 }
-  //               }
-  //             } else {
-  //               if ( link === null ){
-  //                 myBackground.enemiesCollision[indice] = true;
-  //               } else {
-  //                 this.collisionObjet = false;
-  //               }
-  //             }
-  //             // si l'objet n'est pas décalé et le personnage le rencontre retourne false.
-  //             return false;
-  //           }
-  //         } else {
-  //           // test si le sens négatif du mouvement est égale au premier point d'impact de l'objet
-  //           if( !( ( parseFloat(div[mouvementWay]) > ( collisionType[myBackground.stage][i][objectPositionSameAxis] + collisionType[myBackground.stage][i][objectSizeSameAxis] ) ) || ( parseFloat(div[mouvementWay]) + parseFloat(div[divSizeSameAxis]) <= ( collisionType[myBackground.stage][i][objectPositionSameAxis] ) ) ) ) {
-  //             if(link){
-  //               if ( collisionType === myBackground.collisionListe ){
-  //                 //renvoie l'objet touché
-  //                 if ( linkEtat.slachSword == 1 || linkEtat.slachSword == 4 ){
-  //                   linkEtat.touche.keyZPlusObstacle = true;
-  //                   //numéro de l'objet dans le tableau
-  //                   linkEtat.collision.position = i;
-  //                 } else {
-  //                   //colition avec l'épée chargé
-  //                   if ( linkEtat.slachSword == 3 ){
-  //                     //annule le coup d'épée
-  //                     linkEtat.slachSword = 0;
-  //                     //fait disparaitre le scintillement
-  //                     myBackground.item['z-index'] = -1;
-  //                   } else {
-  //                     linkEtat.collision.collisionBooleen = false;
-  //                     //numéro de l'objet dans le tableau
-  //                     linkEtat.collision.position = i;
-  //                   }
-  //                 }
-  //               } else {
-  //                 //vérifi si un coup d'épée est en cour
-  //                 if ( linkEtat.slachSword ){
-  //                   //diminu la vie de l'ennemi
-  //                   myBackground.enemiesStage[myBackground.stage][i].argument.life--;
-  //                   myBackground.enemiesStage[myBackground.stage][i].argument.touche = true;
-  //                 } else {
-  //                   this.touche(myBackground.enemiesStage[myBackground.stage][i].argument.damage);
-  //                   linkEtat.touch = true;
-  //                 }
-  //               }
-  //             } else {
-  //               if ( link === null ){
-  //                 myBackground.enemiesCollision[indice] = true;
-  //               } else {
-  //                 this.collisionObjet = false;
-  //               }
-  //             }
-  //             // si l'objet est décalé et / ou le personnage ne le rencontre pas retourne false.
-  //             return false;
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //   linkEtat.collision.direction = 0;
-  //   //passe la collision à null si il n'y a plus de collision
-  //   if (link) linkEtat.collision.position = null;
-  //   //si tous les test sont vrai à la fin de la boucle retourne true.
-  //   return true;
-  // },
   //test des objet dans l'espace.
-  testObstacle : function( mouvementWay /* left ou top */, boul, /* vérifi avec un bouleen si le sens est positif ou négatif */ div,/* div de l'élément */ elementAVerifier/* élément a tester */ ){
+  testObstacle : function( mouvementWay /* left ou top */, boul, /* vérifi avec un bouleen si le sens est positif ou négatif */ div,/* div de l'élément */ elementAVerifier/* élément a tester */, decallageY /* décalle en y pour les objet lancé */){
     // valeur de l'objet et de la div dans l'axe oposé au mouvement pour savoir si il es aux dessus ou en dessous
     var divPosition; // position de la div
     var divSize; /* hauteur ou largeur */
@@ -152,124 +14,53 @@ var linkAction = {
     var objectPositionSameAxis; // taille de la div
     var objectSizeSameAxis; /* hauteur ou l'argeur */
 
+    //décallage des objet lancé
+    var decallageY = decallageY || 0;
+
     //initialisation des valeur
     if (mouvementWay == 'left'){
       divPosition = 'top';
       divSize = 'height';
-      objectPosition = 'positionY';
+      objectPosition = parseFloat(elementAVerifier['positionY']) + decallageY;
       objectSize = 'tailleY';
       divSizeSameAxis = 'width';
-      objectPositionSameAxis = 'positionX';
+      objectPositionSameAxis = parseFloat(elementAVerifier['positionX']);
       objectSizeSameAxis = 'tailleX';
     } else {
       divPosition = 'left';
       divSize = 'width';
-      objectPosition = 'positionX';
+      objectPosition = parseFloat(elementAVerifier['positionX']);
       objectSize = 'tailleX';
       divSizeSameAxis = 'height';
-      objectPositionSameAxis = 'positionY';
+      objectPositionSameAxis = parseFloat(elementAVerifier['positionY']) + decallageY;
       objectSizeSameAxis = 'tailleY';
     }
+
       //vérifi que l'objet est toujours présent
-      // if ( collisionType[myBackground.stage][i] && collisionType[myBackground.stage][i].existance() ){
+      if ( elementAVerifier == linkEtat.sauvPositionSprite || elementAVerifier.existance() ){
         //test si l'objet n'est pas au dessus ou en dessous ou a gauche ou a droite suivant le sens.
-        if ( !(parseFloat(div[divPosition]) + parseFloat(div[divSize]) <= elementAVerifier[objectPosition] || parseFloat(div[divPosition]) >=  elementAVerifier[objectPosition] + elementAVerifier[objectSize]) ) {
-          if (boul){
+        if ( !(parseFloat(div[divPosition]) + parseFloat(div[divSize]) <= objectPosition || parseFloat(div[divPosition]) >=  objectPosition + elementAVerifier[objectSize]) ) {
+          if (boul) {
             // test si le sens positif du mouvement n'est pas inférieur au premier point d'impact de l'objet ou bien qu'il n'a pas dépassé le bord oposé
-            if( !( ( parseFloat(div[mouvementWay]) + parseFloat(div[divSizeSameAxis]) < elementAVerifier[objectPositionSameAxis] ) || ( parseFloat(div[mouvementWay]) >= ( elementAVerifier[objectPositionSameAxis] + elementAVerifier[objectSizeSameAxis] ) ) ) )
-            {
-              // if(link){
-              //   if ( collisionType === myBackground.collisionListe ){
-              //     //renvoie l'objet touché
-              //     if ( linkEtat.slachSword == 1 || linkEtat.slachSword == 4 ){
-              //       linkEtat.touche.keyZPlusObstacle = true;
-              //       //numéro de l'objet dans le tableau
-              //       linkEtat.collision.position = i;
-              //     } else {
-              //       //colition avec l'épée chargé
-              //       if ( linkEtat.slachSword == 3 ){
-              //         //annule le coup d'épée
-              //         linkEtat.slachSword = 0;
-              //         //fait disparaitre le scintillement
-              //         myBackground.item['z-index'] = -1;
-              //       } else {
-              //         linkEtat.collision.collisionBooleen = false;
-              //         //numéro de l'objet dans le tableau
-              //         linkEtat.collision.position = i;
-              //       }
-              //     }
-              //   } else {
-              //     //vérifi si un coup d'épée est en cour
-              //     if ( linkEtat.slachSword ){
-              //       //diminu la vie de l'ennemi
-              //       myBackground.enemiesStage[myBackground.stage][i].argument.life--;
-              //       myBackground.enemiesStage[myBackground.stage][i].argument.touche = true;
-              //     } else {
-              //       this.touche(myBackground.enemiesStage[myBackground.stage][i].argument.damage);
-              //       linkEtat.touch = true;
-              //     }
-              //   }
-              // } else {
-              //   if ( link === null ){
-              //     myBackground.enemiesCollision[indice] = true;
-              //   } else {
-              //     this.collisionObjet = false;
-              //   }
-              // }
-              // si l'objet n'est pas décalé et le personnage le rencontre retourne false.
+            if( !( ( parseFloat(div[mouvementWay]) + parseFloat(div[divSizeSameAxis]) < objectPositionSameAxis ) || ( parseFloat(div[mouvementWay]) >= ( objectPositionSameAxis + elementAVerifier[objectSizeSameAxis] ) ) ) ) {
+              if ( div == myBackground.item ){
+                console.log('obstacle en contact sens positif');
+                console.log(elementAVerifier);
+              }
               return false;
             }
           } else {
-            // test si le sens négatif du mouvement est égale au premier point d'impact de l'objet
-            if( !( ( parseFloat(div[mouvementWay]) > ( elementAVerifier[objectPositionSameAxis] + elementAVerifier[objectSizeSameAxis] ) ) || ( parseFloat(div[mouvementWay]) + parseFloat(div[divSizeSameAxis]) <= ( elementAVerifier[objectPositionSameAxis] ) ) ) ) {
-              // if(link){
-              //   if ( collisionType === myBackground.collisionListe ){
-              //     //renvoie l'objet touché
-              //     if ( linkEtat.slachSword == 1 || linkEtat.slachSword == 4 ){
-              //       linkEtat.touche.keyZPlusObstacle = true;
-              //       //numéro de l'objet dans le tableau
-              //       linkEtat.collision.position = i;
-              //     } else {
-              //       //colition avec l'épée chargé
-              //       if ( linkEtat.slachSword == 3 ){
-              //         //annule le coup d'épée
-              //         linkEtat.slachSword = 0;
-              //         //fait disparaitre le scintillement
-              //         myBackground.item['z-index'] = -1;
-              //       } else {
-              //         linkEtat.collision.collisionBooleen = false;
-              //         //numéro de l'objet dans le tableau
-              //         linkEtat.collision.position = i;
-              //       }
-              //     }
-              //   } else {
-              //     //vérifi si un coup d'épée est en cour
-              //     if ( linkEtat.slachSword ){
-              //       //diminu la vie de l'ennemi
-              //       myBackground.enemiesStage[myBackground.stage][i].argument.life--;
-              //       myBackground.enemiesStage[myBackground.stage][i].argument.touche = true;
-              //     } else {
-              //       this.touche(myBackground.enemiesStage[myBackground.stage][i].argument.damage);
-              //       linkEtat.touch = true;
-              //     }
-              //   }
-              // } else {
-              //   if ( link === null ){
-              //     myBackground.enemiesCollision[indice] = true;
-              //   } else {
-              //     this.collisionObjet = false;
-              //   }
-              // }
-              // si l'objet est décalé et / ou le personnage ne le rencontre pas retourne false.
+            // test si le sens négatif du mouvement n'est pas inférieur au premier point d'impact de l'objet ou bien qu'il n'a pas dépassé le bord oposé
+            if( !( ( parseFloat(div[mouvementWay]) > ( objectPositionSameAxis + elementAVerifier[objectSizeSameAxis] ) ) || ( parseFloat(div[mouvementWay]) + parseFloat(div[divSizeSameAxis]) <= ( objectPositionSameAxis ) ) ) ) {
+              if ( div == myBackground.item ){
+                console.log('obstacle en contact sens negatif');
+                console.log(elementAVerifier);
+              }
               return false;
             }
           }
         }
-      // }
-    // linkEtat.collision.direction = 0;
-    // //passe la collision à null si il n'y a plus de collision
-    // if (link) linkEtat.collision.position = null;
-    //si tous les test sont vrai à la fin retourne true.
+      }
     return true;
   },
   touche : function(damage){
@@ -295,6 +86,8 @@ var linkAction = {
         }
       }
     }
+    //vérifi si link a encore des point de vie
+    if ( linkEtat.life[0] <= 0 ) linkEtat.spritePosition.position = 0;
   },
   spriteSelection : function ( temps, spriteAction, defautSprite, direction ){
     //la position est bloqué si l'épée est chargé
@@ -313,17 +106,26 @@ var linkAction = {
           break;
         case 'NW':
         case 'NE':
-          linkEtat.spritePosition.direction = 5;
+          if ( linkEtat.item.shield || linkEtat.touche.keyAPlusObjet ){
+            linkEtat.spritePosition.direction = 1;
+          } else {
+            linkEtat.spritePosition.direction = 5;
+          }
           break;
         case 'SW':
         case 'SE':
-          linkEtat.spritePosition.direction = 6;
+          if ( linkEtat.item.shield || linkEtat.touche.keyAPlusObjet ){
+            linkEtat.spritePosition.direction = 0;
+          } else {
+            linkEtat.spritePosition.direction = 6;
+          }
           break;
       }
     }
     linkEtat.spriteMouvement = true;
     //vérifi si un obstacle est rencontré depuis plus d'une seconde
     if(temps && !linkEtat.touche.keyA && !(linkEtat.collision.position === null)){
+      this.temps = 100;
       //initialise l'animation du sprite pour pousser
       linkEtat.spritePosition.action = 4;
     } else {
@@ -333,15 +135,21 @@ var linkAction = {
     //sprite par defaut quand la touche est laché
     linkEtat.actionOff.sprite = defautSprite;
     if( this.spriteLink[linkEtat.spritePosition.color][linkEtat.spritePosition.direction][linkEtat.spritePosition.action][linkEtat.spritePosition.position] ){//vérifi la position du sprite pour incrémenter le compteur
-      if( ( linkEtat.touche.direction == 'W' || linkEtat.touche.direction == 'NE' || linkEtat.touche.direction == 'SW' ) && ( linkEtat.slachSword != 3 || linkEtat.directionSword == 'W' ) ){//vérifi le sens pour mettre un sens négatif
-        this.linkSprite.style.transform = 'scaleX(-1)';
-        linkEtat.tailleSprite = -1111 + this.spriteLink[linkEtat.spritePosition.color][linkEtat.spritePosition.direction][linkEtat.spritePosition.action][linkEtat.spritePosition.position].tailleX;//envoie la dimension en scale -1
-      } else {
-        this.linkSprite.style.transform = 'scaleX(1)';
-        linkEtat.tailleSprite = 0;//envoie la dimension en scale 1
+      //vérifi le sens pour mettre un sens négatif
+      if ( linkEtat.slachSword != 3 ){
+        if( linkEtat.touche.direction == 'W' || (linkEtat.touche.direction == 'NE' && linkEtat.spritePosition.direction == 5) || (linkEtat.touche.direction == 'SW' && linkEtat.spritePosition.direction == 6)  ){
+          this.linkSprite.style.transform = 'scaleX(-1)';
+          //envoie la dimension en scale -1
+          linkEtat.tailleSprite = -1111 + this.spriteLink[linkEtat.spritePosition.color][linkEtat.spritePosition.direction][linkEtat.spritePosition.action][linkEtat.spritePosition.position].tailleX;
+        } else {
+          this.linkSprite.style.transform = 'scaleX(1)';
+          //envoie la dimension en scale 1
+          linkEtat.tailleSprite = 0;
+        }
       }
 
-      this.spriteDefaut(this.spriteLink[linkEtat.spritePosition.color][linkEtat.spritePosition.direction][linkEtat.spritePosition.action][linkEtat.spritePosition.position]);//modifi la position du sprite visible
+      //modifi la position du sprite visible
+      this.spriteDefaut(this.spriteLink[linkEtat.spritePosition.color][linkEtat.spritePosition.direction][linkEtat.spritePosition.action][linkEtat.spritePosition.position]);
 
       if ( direction ) {
         linkEtat.spritePosition.position++;//quand une touche de direction est appuyé avence le sprite
@@ -371,13 +179,13 @@ var linkAction = {
         linkEtat.spritePosition.position-=2;//décrémente la position du sprite quand la touche a est enfoncé sur un obstacle.
       }
       this.spriteDefaut(this.spriteLink[linkEtat.spritePosition.color][linkEtat.spritePosition.direction][linkEtat.spritePosition.action][linkEtat.spritePosition.position]);
-      if( linkEtat.touche.direction == 'W' || linkEtat.touche.direction == 'NE' || linkEtat.touche.direction == 'SW' ){
-        this.linkSprite.style.transform = 'scaleX(-1)';
-        linkEtat.tailleSprite = -1111 + this.spriteLink[linkEtat.spritePosition.color][linkEtat.spritePosition.direction][linkEtat.spritePosition.action][linkEtat.spritePosition.position].tailleX;//envoie la dimension en scale -1
-      } else {
-        this.linkSprite.style.transform = 'scaleX(1)';
-        linkEtat.tailleSprite = 0;//envoie la dimension en scale 1
-      }
+      // if( linkEtat.touche.direction == 'W' || linkEtat.touche.direction == 'NE' || linkEtat.touche.direction == 'SW' ){
+      //   this.linkSprite.style.transform = 'scaleX(-1)';
+      //   linkEtat.tailleSprite = -1111 + this.spriteLink[linkEtat.spritePosition.color][linkEtat.spritePosition.direction][linkEtat.spritePosition.action][linkEtat.spritePosition.position].tailleX;//envoie la dimension en scale -1
+      // } else {
+      //   this.linkSprite.style.transform = 'scaleX(1)';
+      //   linkEtat.tailleSprite = 0;//envoie la dimension en scale 1
+      // }
     }
   },
   walk : 0,//valeur de marche
@@ -385,37 +193,67 @@ var linkAction = {
   lastPosition : -1,
   counter : 0,
   //fonction de déplacement de la div
-  moving : function(axe/* x ou y */, sens /* positif ou negatif */, div /* element en mouvement */, direction /* direction au moment de l'impact */, indice/* indice du tableau d'ennemi */){
+  moving : function(axe/* x ou y */, sens /* positif ou negatif */, div /* element en mouvement */, elementAVerifier/* élément a tester */, direction/* direction du mouvement */, objet/* enregistre la direction du mouvement */, decallageY/* décalage en Y si besoin */, secondElementAverifier, secondeObjet){
     var deplacement = -1;
     if (sens) deplacement = 1;
-    for (var i=0;collisionType[myBackground.stage][i];i++){
-      if ( this.testObstacle(axe, sens, div, myBackground.enemiesStage[this.stage][i]) )
+    //parcour le tableau du premier élément
+    for (var i=0;(elementAVerifier[i] && !objet.collisionBooleen);i++){
+      //vérifi si une collision à lieu
+      if ( !this.testObstacle(axe, sens, div, elementAVerifier[i], decallageY) ){
+        //enregistre le sens
+        objet.direction = direction;
+        //la collision passe à faut
+        objet.collisionBooleen = 1;
+        //enregistre l'indice de l'objet
+        objet.position = i;
+      }
     }
-    if ( link ) {
-      //vérifie si un ennemis est touché par link
-        if ( this.testObstacle(axe, sens, div, link, (indice || undefined)) ){
-          div[axe] = (parseFloat(div[axe]) + deplacement) + 'px';
-        } else {
-          return direction;
+    //verifi si l'argument à été donné
+    if ( secondElementAverifier ){
+      //verifi si il s'agit d'un tableau
+      if ( Array.isArray(secondElementAverifier) ){
+        //parcour le tableau du second élément
+        for (var j=0;(secondElementAverifier[j] && !secondeObjet.collisionBooleen);j++){
+          //vérifi si une collision à lieu
+          if ( !this.testObstacle(axe, sens, div, secondElementAverifier[j], decallageY) ){
+            //enregistre le sens
+            secondeObjet.direction = direction;
+            //la collision passe à faut
+            secondeObjet.collisionBooleen = 1;
+            //enregistre l'indice de l'objet
+            secondeObjet.position = j;
+          }
         }
       } else {
-        //si l'épée est chargé déclanche l'attaque au contact de l'ennemis
-        if ( linkEtat.slachSword == 3 ) {
-          linkEtat.slachSword = 4;
+        if ( !this.testObstacle(axe, sens, div, secondElementAverifier) ){
+          secondeObjet.direction = direction;
+          secondeObjet.collisionBooleen = 1;
         }
       }
-    } else {
-      if ( this.testObstacle(axe, sens, div, link, (indice || undefined)) ){
+      //si aucune collision n'a eu lieu réinitialise les valeurs et déplace la div
+      if ( secondeObjet.direction != direction && objet.direction != direction ){
         div[axe] = (parseFloat(div[axe]) + deplacement) + 'px';
-      } else {
-        return direction;
+        secondeObjet.collisionBooleen = 0;
+        secondeObjet.position = null;
+        secondeObjet.direction = null;
+        objet.collisionBooleen = 0;
+        objet.position = null;
+        objet.direction = null;
+      }
+    } else {
+      //si aucune collision n'a eu lieu réinitialise les valeurs et déplace la div
+      if ( objet.direction != direction ){
+        div[axe] = (parseFloat(div[axe]) + deplacement) + 'px';
+        objet.collisionBooleen = 0;
+        objet.position = null;
+        objet.direction = null;
       }
     }
   },
   //test des touche directionnelle appuyé
   testDirection : function(){
     //les touches autre que direction ne sont pas enfoncé et il n'y a pas d'action lié au obstacle en cour ni de coup d'épée
-    if ( !linkEtat.timeObstacle.actionObjet && !linkEtat.touche.keyA && ( linkEtat.slachSword == 3 || linkEtat.slachSword == 0 ) && !linkEtat.glove ){
+    if ( !linkEtat.touche.keyA && ( linkEtat.slachSword == 3 || linkEtat.slachSword == 0 ) && !linkEtat.glove ){
       //vérifi si on monte ou on decent un escalier
       if ( !this.counter ){
         //déplacement  vers la gauche
@@ -423,10 +261,9 @@ var linkAction = {
         if( linkEtat.touche.left && !linkEtat.touche.right && !linkEtat.touche.top && !linkEtat.touche.bottom ){
           linkEtat.touche.direction = 'W';
           this.spriteSelection( linkEtat.timeObstacle.supSecondeLeft, this.walk, this.spriteLink[linkEtat.spritePosition.color][2][this.walk][this.defaut], linkEtat.touche.left );
-          if( !(linkEtat.collision.direction == 'W' && linkEtat.collision.collisionBooleen) ){
-            /* enregistre le sens de la collisition */
-            linkEtat.collision.direction = this.moving('left', false, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
-            linkEtat.collision.direction = this.moving('left', false, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
+          if( !(linkEtat.collision.direction == 'W' && !linkEtat.collision.collisionBooleen) ){
+            this.moving('left', 0, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
+            this.moving('left', 0, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
           }
         } else {
           //vide le compteur de temps quand la touche n'est plus appuyé
@@ -438,9 +275,9 @@ var linkAction = {
         if(!linkEtat.touche.left && !linkEtat.touche.right && linkEtat.touche.top && !linkEtat.touche.bottom ){
           linkEtat.touche.direction = 'N';
           this.spriteSelection( linkEtat.timeObstacle.supSecondeTop, this.walk, this.spriteLink[linkEtat.spritePosition.color][1][this.walk][this.defaut], linkEtat.touche.top );
-          if( !(linkEtat.collision.direction == 'N' && linkEtat.collision.collisionBooleen) ){
-            linkEtat.collision.direction = this.moving('top', false, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
-            linkEtat.collision.direction = this.moving('top', false, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
+          if( !(linkEtat.collision.direction == 'N' && !linkEtat.collision.collisionBooleen) ){
+            this.moving('top', 0, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
+            this.moving('top', 0, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
           }
         } else {
           linkEtat.timeObstacle.topStart = 0;
@@ -450,9 +287,9 @@ var linkAction = {
         if(!linkEtat.touche.left && linkEtat.touche.right && !linkEtat.touche.top && !linkEtat.touche.bottom ){
           linkEtat.touche.direction = 'E';
           this.spriteSelection( linkEtat.timeObstacle.supSecondeRight, this.walk, this.spriteLink[linkEtat.spritePosition.color][2][this.walk][this.defaut], linkEtat.touche.right );
-          if(  !(linkEtat.collision.direction == 'E' && linkEtat.collision.collisionBooleen) ){
-            linkEtat.collision.direction = this.moving('left', true, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
-            linkEtat.collision.direction = this.moving('left', true, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
+          if(  !(linkEtat.collision.direction == 'E' && !linkEtat.collision.collisionBooleen) ){
+            this.moving('left', 1, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
+            this.moving('left', 1, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
           }
         } else {
           linkEtat.timeObstacle.rightStart = 0;
@@ -462,68 +299,66 @@ var linkAction = {
         if( !linkEtat.touche.left && !linkEtat.touche.right && !linkEtat.touche.top && linkEtat.touche.bottom ){
           linkEtat.touche.direction = 'S';
           this.spriteSelection( linkEtat.timeObstacle.supSecondeBottom, this.walk, this.spriteLink[linkEtat.spritePosition.color][0][this.walk][this.defaut], linkEtat.touche.bottom );
-          if(  !(linkEtat.collision.direction == 'S' && linkEtat.collision.collisionBooleen) ){
-            linkEtat.collision.direction = this.moving('top', true, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
-            linkEtat.collision.direction = this.moving('top', true, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
+          if(  !(linkEtat.collision.direction == 'S' && !linkEtat.collision.collisionBooleen) ){
+            this.moving('top', 1, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
+            this.moving('top', 1, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
           }
         } else {
           linkEtat.timeObstacle.bottomStart = null;
           linkEtat.timeObstacle.supSecondeBottom = false;
         }
-        if ( !linkEtat.touche.keyAPlusObjet && !linkEtat.item.shield ){
-          //déplacement diagonal haut gauche
-          if(linkEtat.touche.left && !linkEtat.touche.right && linkEtat.touche.top && !linkEtat.touche.bottom ){
-            this.spriteSelection( linkEtat.timeObstacle.supSecondeTop, 0, this.spriteLink[linkEtat.spritePosition.color][1][this.walk][this.defaut], (linkEtat.touche.left && linkEtat.touche.top) );
-            if(  !(linkEtat.collision.direction == 'N' && linkEtat.collision.collisionBooleen) ) {
-              //test des obstacles vers le haut
-              linkEtat.touche.direction = 'N';
-              linkEtat.collision.direction = this.moving('top', false, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
-              //test des obstacles vers la gauche
-              linkEtat.touche.direction = 'W';
-              linkEtat.collision.direction = this.moving('left', false, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
-            }
-            linkEtat.touche.direction = 'NW';
-          }
-          //déplacement  diagonal haut droite
-          if(!linkEtat.touche.left && linkEtat.touche.right && linkEtat.touche.top && !linkEtat.touche.bottom ){
-            this.spriteSelection( linkEtat.timeObstacle.supSecondeTop, 00, this.spriteLink[linkEtat.spritePosition.color][1][this.walk][this.defaut], (linkEtat.touche.right && linkEtat.touche.top) );
-            if(  !(linkEtat.collision.direction == 'N' && linkEtat.collision.collisionBooleen) ) {
-              //test des obstacles vers le haut
-              linkEtat.touche.direction = 'N';
-              linkEtat.collision.direction = this.moving('top', false, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
-              //test des obstacles vers la droite
-              linkEtat.touche.direction = 'E';
-              linkEtat.collision.direction = this.moving('left', true, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
-            }
-            linkEtat.touche.direction = 'NE';
-          }
-          //déplacement  diagonal bas droite
-          if(!linkEtat.touche.left && linkEtat.touche.right && !linkEtat.touche.top && linkEtat.touche.bottom ){
-            this.spriteSelection( linkEtat.timeObstacle.supSecondeBottom, 0, this.spriteLink[linkEtat.spritePosition.color][0][this.walk][this.defaut], (linkEtat.touche.bottom && linkEtat.touche.right) );
-            if(  !(linkEtat.collision.direction == 'E' && linkEtat.collision.collisionBooleen) ) {
-              //test des obstacles vers le bas
-              linkEtat.touche.direction = 'S';
-              linkEtat.collision.direction = this.moving('top', true, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
-              //test des obstacles vers la droite
-              linkEtat.touche.direction = 'E';
-              linkEtat.collision.direction = this.moving('left', true, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
-            }
-            linkEtat.touche.direction = 'SE';
-          }
-          //déplacement  diagonal bas gauche
-          if( linkEtat.touche.left && !linkEtat.touche.right && !linkEtat.touche.top && linkEtat.touche.bottom ){
-            this.spriteSelection( linkEtat.timeObstacle.supSecondeBottom, 0, this.spriteLink[linkEtat.spritePosition.color][0][this.walk][this.defaut], (linkEtat.touche.left && linkEtat.touche.bottom) );
+        //déplacement diagonal haut gauche
+        if(linkEtat.touche.left && !linkEtat.touche.right && linkEtat.touche.top && !linkEtat.touche.bottom ){
+          this.spriteSelection( linkEtat.timeObstacle.supSecondeTop, 0, this.spriteLink[linkEtat.spritePosition.color][1][this.walk][this.defaut], (linkEtat.touche.left && linkEtat.touche.top) );
+          if(  !(linkEtat.collision.direction == 'N' && !linkEtat.collision.collisionBooleen) ) {
+            //test des obstacles vers le haut
+            linkEtat.touche.direction = 'N';
+            this.moving('top', 0, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
             //test des obstacles vers la gauche
-            if(  !(linkEtat.collision.direction == 'W' && linkEtat.collision.collisionBooleen) ){
-              //test des obstacles vers le bas
-              linkEtat.touche.direction = 'S';
-              linkEtat.collision.direction = this.moving('top', true, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
-              //test des obstacles vers la gauche
-              linkEtat.touche.direction = 'W';
-              linkEtat.collision.direction = this.moving('left', false, this.divPersonnage, linkEtat.touche.direction, true, linkEtat.collision.collisionBooleen) || linkEtat.collision.direction;
-            }
-            linkEtat.touche.direction = 'SW';
+            linkEtat.touche.direction = 'W';
+            this.moving('left', 0, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
           }
+          linkEtat.touche.direction = 'NW';
+        }
+        //déplacement  diagonal haut droite
+        if(!linkEtat.touche.left && linkEtat.touche.right && linkEtat.touche.top && !linkEtat.touche.bottom ){
+          this.spriteSelection( linkEtat.timeObstacle.supSecondeTop, 00, this.spriteLink[linkEtat.spritePosition.color][1][this.walk][this.defaut], (linkEtat.touche.right && linkEtat.touche.top) );
+          if(  !(linkEtat.collision.direction == 'N' && !linkEtat.collision.collisionBooleen) ) {
+            //test des obstacles vers le haut
+            linkEtat.touche.direction = 'N';
+            this.moving('top', 0, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
+            //test des obstacles vers la droite
+            linkEtat.touche.direction = 'E';
+            this.moving('left', 1, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
+          }
+          linkEtat.touche.direction = 'NE';
+        }
+        //déplacement  diagonal bas droite
+        if(!linkEtat.touche.left && linkEtat.touche.right && !linkEtat.touche.top && linkEtat.touche.bottom ){
+          this.spriteSelection( linkEtat.timeObstacle.supSecondeBottom, 0, this.spriteLink[linkEtat.spritePosition.color][0][this.walk][this.defaut], (linkEtat.touche.bottom && linkEtat.touche.right) );
+          if(  !(linkEtat.collision.direction == 'E' && !linkEtat.collision.collisionBooleen) ) {
+            //test des obstacles vers le bas
+            linkEtat.touche.direction = 'S';
+            this.moving('top', 1, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
+            //test des obstacles vers la droite
+            linkEtat.touche.direction = 'E';
+            this.moving('left', 1, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
+          }
+          linkEtat.touche.direction = 'SE';
+        }
+        //déplacement  diagonal bas gauche
+        if( linkEtat.touche.left && !linkEtat.touche.right && !linkEtat.touche.top && linkEtat.touche.bottom ){
+          this.spriteSelection( linkEtat.timeObstacle.supSecondeBottom, 0, this.spriteLink[linkEtat.spritePosition.color][0][this.walk][this.defaut], (linkEtat.touche.left && linkEtat.touche.bottom) );
+          //test des obstacles vers la gauche
+          if(  !(linkEtat.collision.direction == 'W' && !linkEtat.collision.collisionBooleen) ){
+            //test des obstacles vers le bas
+            linkEtat.touche.direction = 'S';
+            this.moving('top', 1, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
+            //test des obstacles vers la gauche
+            linkEtat.touche.direction = 'W';
+            this.moving('left', 0, this.divPersonnage, myBackground.collisionListe[myBackground.stage], linkEtat.touche.direction, linkEtat.collision, 0, myBackground.enemiesStage[myBackground.stage], linkEtat.collisionEnemi);
+          }
+          linkEtat.touche.direction = 'SW';
         }
       }
       if ( linkEtat.collision.position != null ){
@@ -573,6 +408,35 @@ var linkAction = {
           }
         }
       }
+      // colition avec l'épée chargé
+      if ( linkEtat.slachSword == 3){
+        if ( linkEtat.collision.collisionBooleen ){
+          //annule le coup d'épée
+          linkEtat.slachSword = 0;
+          //fait disparaitre le scintillement
+          myBackground.item['z-index'] = -1;
+        }
+        if ( linkEtat.collisionEnemi.collisionBooleen ){
+          //déclanche l'attaque spéciale
+          linkEtat.slachSword = 4;
+          //vérifie si l'ennemi touché n'a pas déjà été touché il y a moins de 0.5s
+          if ( Date.now() - myBackground.enemiesStage[myBackground.stage][linkEtat.collisionEnemi.position].argument.lastFire > 500 ){
+            //diminu la vie de l'ennemi de 2
+            myBackground.enemiesStage[myBackground.stage][linkEtat.collisionEnemi.position].argument.life -= 2;
+            myBackground.enemiesStage[myBackground.stage][linkEtat.collisionEnemi.position].argument.lastFire = Date.now();
+            myBackground.enemiesStage[myBackground.stage][linkEtat.collisionEnemi.position].argument.hit = 0;
+          }
+        }
+      } else {
+        if ( linkEtat.collisionEnemi.collisionBooleen ){
+          //vérifie si l'ennemi touché n'a pas déjà été touché il y a moins de 0.5s et si link a été touché il y a moins d'une seconde et a encore des point de vie
+          if ( Date.now() - myBackground.enemiesStage[myBackground.stage][linkEtat.collisionEnemi.position].argument.lastFire > 500 && Date.now() - linkEtat.collisionEnemi.lastFire > 1000 &&  myBackground.enemiesStage[myBackground.stage][linkEtat.collisionEnemi.position].argument.life >= 0 ){
+            this.touche(myBackground.enemiesStage[myBackground.stage][linkEtat.collisionEnemi.position].argument.damage);
+            linkEtat.collisionEnemi.lastFire = Date.now();
+            linkEtat.collisionEnemi.hit = 0;
+          }
+        }
+      }
     }
     //coup d'épée
     if ( (linkEtat.item.sword && linkEtat.touche.keyZ && !linkEtat.touche.keyAPlusObjet && !linkEtat.touche.keyA) || linkEtat.slachSword == 1 || linkEtat.slachSword == 4 || linkEtat.slachSword == 3 ){
@@ -595,27 +459,46 @@ var linkAction = {
           linkEtat.sensSword = false;
           break;
       }
-      //coup d'épée sur un obstacles
-      this.testObstacle(linkEtat.axieSword, linkEtat.sensSword,  this.divPersonnage, true );
+      for (var i=0;myBackground.collisionListe[myBackground.stage][i];i++){
+        //coup d'épée sur un obstacles
+        if ( !this.testObstacle(linkEtat.axieSword, linkEtat.sensSword, linkEtat.sauvPositionSprite, myBackground.collisionListe[myBackground.stage][i] ) ){
+          //vérifi si il est destructible
+          if ( myBackground.collisionListe[myBackground.stage][i].argument.destructible ){
+            //enregistre l'objet détruit
+            this.liftObject = this.spriteLink[4][myBackground.collisionListe[myBackground.stage][i].argument.indice];
+            //objet détruit
+            myBackground.affiche(this.liftObject, myBackground.item);
+            //monte l'image pour modifier le décor
+            myBackground.div[myBackground.collisionListe[myBackground.stage][i].id].style['z-index'] = 1;
+            //annule la collision
+            linkEtat.touche.keyZPlusObstacle = 1;
+            //annule la collision
+            linkEtat.throwObjet.collisionBooleen = 0;
+            //supression de l'objet
+            myBackground.collisionListe[myBackground.stage][i].modif(false);
+            linkEtat.throwObjet.objetPosition = 0;
+            this.requestID = window.requestAnimationFrame(function(timestamp){linkAction.launch(timestamp)});
+          }
+        }
+      }
       //coup d'épée sur un ennemi
-      this.testObstacle(linkEtat.axieSword, linkEtat.sensSword, this.divPersonnage, true, 0, myBackground.enemiesStage)
-      //vérifi si une collision a eu lieu avec l'épée
-      if ( linkEtat.collision.position != null ){
-        if ( linkEtat.touche.keyZPlusObstacle && myBackground.collisionListe[myBackground.stage][linkEtat.collision.position].argument.destructible ){
-          //enregistre l'objet détruit
-          this.liftObject = this.spriteLink[4][myBackground.collisionListe[myBackground.stage][linkEtat.collision.position].argument.indice];
-          //objet détruit
-          myBackground.affiche(this.liftObject, myBackground.item);
-          //monte l'image pour modifier le décor
-          myBackground.div[myBackground.collisionListe[myBackground.stage][linkEtat.collision.position].id].style['z-index'] = 1;
-          //annule la collision
-          linkEtat.touche.keyZPlusObstacle = true;
-          //annule la collision
-          this.collisionObjet = false;
-          //supression de l'objet
-          myBackground.collisionListe[myBackground.stage][linkEtat.collision.position].modif(false);
-          this.objetPosition = 0;
-          this.requestID = window.requestAnimationFrame(function(timestamp){linkAction.launch(timestamp)});
+      if ( myBackground.enemiesStage[myBackground.stage][0] ){
+        for (var i=0;myBackground.enemiesStage[myBackground.stage][i];i++){
+          if ( !this.testObstacle(linkEtat.axieSword, linkEtat.sensSword, linkEtat.sauvPositionSprite, myBackground.enemiesStage[myBackground.stage][i] ) ){
+            //vérifie si l'ennemi touché n'a pas déjà été touché il y a moins de 0.5s
+            if ( Date.now() - myBackground.enemiesStage[myBackground.stage][i].argument.lastFire > 500 ){
+              myBackground.enemiesStage[myBackground.stage][i].argument.life--;
+              myBackground.enemiesStage[myBackground.stage][i].argument.lastFire = Date.now();
+              myBackground.enemiesStage[myBackground.stage][i].argument.hit = 0;
+            }
+            //objet détruit
+            //myBackground.affiche(this.liftObject, myBackground.item);
+            //annule la collision
+            linkEtat.touche.keyZPlusObstacle = 1;
+            //annule la collision
+            linkEtat.throwObjet.collisionBooleen = 0;
+            linkEtat.throwObjet.objetPosition = 0;
+          }
         }
       }
       this.temps = 20;
@@ -677,16 +560,18 @@ var linkAction = {
     }
     //lancer objet
     if ( linkEtat.touche.keyAPlusObjet && linkEtat.touche.keyA && this.lastPosition < 0 && !linkEtat.slachSword ){
+      //repasse objet avec gant à faut
+      linkEtat.glove = 0;
       //enregistre le sens du lancé
-      linkEtat.glove = false;
-      this.directionObjet = linkEtat.touche.direction;
-      this.collisionObjet = true;
+      linkEtat.throwObjet.directionObjet = linkEtat.touche.direction;
+      //la collision de l'objet passe à vrai
+      linkEtat.throwObjet.collisionBooleen = 0;
       //positionne le sprite de l'objet
       this.distanceObjectTop = parseFloat(myBackground.item.top);
       //positionne le sprite de l'objet
       this.distanceObjectLeft = parseFloat(myBackground.item.left);
       this.time = 10;
-      this.objetPosition = 0;
+      linkEtat.throwObjet.objetPosition = 0;
       //lance l'objet
       this.requestID = window.requestAnimationFrame(function(timestamp){linkAction.launch(timestamp)});
       //passe l'objet soulevé à false
@@ -703,13 +588,15 @@ var linkAction = {
       }
       linkEtat.actionOff.sprite = this.spriteLink[linkEtat.spritePosition.color][linkEtat.spritePosition.direction][this.walk][3]
     } else {
-      if ( linkEtat.touche.keyA && !linkEtat.touche.left && !linkEtat.touche.right && !linkEtat.touche.top && !linkEtat.touche.bottom && !linkEtat.collision.collisionBooleen &&  linkEtat.collision.position != null ){
+      if ( linkEtat.touche.keyA && !linkEtat.touche.left && !linkEtat.touche.right && !linkEtat.touche.top && !linkEtat.touche.bottom && linkEtat.collision.collisionBooleen &&  linkEtat.collision.position != null ){
         this.temps = 150;
         //vérifie si on est devant un objet soulevable
         if ( myBackground.collisionListe[myBackground.stage][linkEtat.collision.position].argument.lift && ( !myBackground.collisionListe[myBackground.stage][linkEtat.collision.position].argument.glove || linkEtat.item.glove ) ){
           if ( myBackground.collisionListe[myBackground.stage][linkEtat.collision.position].argument.glove ){
-            linkEtat.glove = false;
+            //si l'objet necessite des gants
+            linkEtat.glove = 1;
           }
+          myBackground.collisionListe[myBackground.stage][linkEtat.collision.position].modif(false);
           linkEtat.spritePosition.position = 0;
           //nombre d'élément du sprite pour soulever
           this.lastPosition = this.spriteLink[linkEtat.spritePosition.color][linkEtat.spritePosition.direction][2].length;
@@ -728,13 +615,13 @@ var linkAction = {
           myBackground.item.top = myBackground.collisionListe[myBackground.stage][linkEtat.collision.position].positionY + 'px';
           myBackground.item.left = myBackground.collisionListe[myBackground.stage][linkEtat.collision.position].positionX + 'px';
           myBackground.shadow['z-index'] = 1;
-          myBackground.item['z-index'] = 2;
+          myBackground.item['z-index'] = 3;
           //objet soulevé
           myBackground.requestIDLift = window.requestAnimationFrame(function(timestamp){myBackground.lift(timestamp)});
           //monte l'image pour modifier le décor
           myBackground.div[myBackground.collisionListe[myBackground.stage][linkEtat.collision.position].id].style['z-index'] = 1;
           //annule la collision
-          linkEtat.collision.collisionBooleen = true;
+          linkEtat.collision.collisionBooleen = 0;
           //supression de l'objet
           myBackground.collisionListe[myBackground.stage][linkEtat.collision.position].modif(false);
           //marche avec objet
@@ -744,7 +631,7 @@ var linkAction = {
           linkEtat.touche.keyAPlusObjet = true;
         }
       }
-      if( ( (linkEtat.touche.keyA && !linkEtat.touche.left && !linkEtat.touche.right && !linkEtat.touche.top && !linkEtat.touche.bottom) || linkEtat.touche.keyAPlusObstacle) && !linkEtat.collision.collisionBooleen && linkEtat.collision.position != null ){
+      if( ( (linkEtat.touche.keyA && !linkEtat.touche.left && !linkEtat.touche.right && !linkEtat.touche.top && !linkEtat.touche.bottom) || linkEtat.touche.keyAPlusObstacle) && linkEtat.collision.collisionBooleen && linkEtat.collision.position != null ){
         //vérifie si on est devant un item
         if (myBackground.collisionListe[myBackground.stage][linkEtat.collision.position].argument.treasure && !linkEtat.chestOpen[myBackground.stage][linkEtat.collision.position] ){
           //passe le temps à 2s quand un objet est trouvé
@@ -803,8 +690,6 @@ var linkAction = {
   },
   startObjet : null,
   time : 40,
-  //booleen qui enregistre la collision
-  collisionObjet : false,
   //indice de l'animation des objet détruit
   objetPosition : 0,
   compteur : 0,
@@ -818,64 +703,76 @@ var linkAction = {
     progress = timestamp - this.startObjet;
     if ( progress > this.time ){
       this.startObjet = timestamp;
-      if( this.collisionObjet && myBackground.item.top != myBackground.shadow.top ){
+      if( !linkEtat.throwObjetVerify.collisionBooleen && myBackground.item.top != myBackground.shadow.top ){
         //distance parcouru par le sprite
-        switch (this.directionObjet) {
+        switch (linkEtat.throwObjet.directionObjet) {
           case 'S':
-            sens = true;
+            sens = 1;
             axies = 'top';
-            if ( (parseFloat(myBackground.item.top) - this.distanceObjectTop) > 50 && this.compteur > 10 ){
-              this.moving( axies, sens, myBackground.item, this.directionObjet, false, this.collisionObjet );
+            myBackground.item.top = (parseFloat(myBackground.item.top) + 1) + 'px';
+            myBackground.shadow.top = (parseFloat(myBackground.shadow.top) + 1) + 'px';
+            if ( Math.abs(parseFloat(myBackground.item.top) - this.distanceObjectTop) < 50 && this.compteur > 5 ){
+              myBackground.item.top = (parseFloat(myBackground.item.top) + 1) + 'px';
               this.compteur = 0;
             } else { this.compteur++; }
             break;
           case 'N':
-            sens = false;
+            sens = 0;
             axies = 'top';
-            if ( parseFloat(myBackground.item.top) - this.distanceObjectTop < 50 && this.compteur > 5 ){
-              this.moving( axies, sens, myBackground.item, this.directionObjet, false, this.collisionShadow );
+            myBackground.item.top = (parseFloat(myBackground.item.top) - 1) + 'px';
+            myBackground.shadow.top = (parseFloat(myBackground.shadow.top) - 1) + 'px';
+            if ( Math.abs(parseFloat(myBackground.item.top) - this.distanceObjectTop) < 50 && this.compteur > 5 ){
+              myBackground.item.top = (parseFloat(myBackground.item.top) + 1) + 'px';
               this.compteur = 0;
             } else { this.compteur++; }
             break;
           case 'E':
-            sens = true;
+            sens = 1;
             axies = 'left';
-            if ( parseFloat(myBackground.item.left) - this.distanceObjectLeft > 50 && this.compteur > 5 ){
+            myBackground.item.left = (parseFloat(myBackground.item.left) + 1) + 'px';
+            myBackground.shadow.left = (parseFloat(myBackground.shadow.left) + 1) + 'px';
+            if ( Math.abs(parseFloat(myBackground.item.left) - this.distanceObjectLeft) < 50 && this.compteur > 5 ){
               myBackground.item.top = (parseFloat(myBackground.item.top) + 1) + 'px';
               this.compteur = 0;
             } else { this.compteur++; }
             break;
           case 'W':
-            sens = false;
+            sens = 0;
             axies = 'left';
-            if ( parseFloat(myBackground.item.left) - this.distanceObjectLeft < 50 && this.compteur > 5 ){
+            myBackground.item.left = (parseFloat(myBackground.item.left) - 1) + 'px';
+            myBackground.shadow.left = (parseFloat(myBackground.shadow.left) - 1) + 'px';
+            if ( Math.abs(parseFloat(myBackground.item.left) - this.distanceObjectLeft) < 50 && this.compteur > 5 ){
               myBackground.item.top = (parseFloat(myBackground.item.top) + 1) + 'px';
               this.compteur = 0;
             } else { this.compteur++; }
             break;
         }
-        this.moving( axies, sens, myBackground.item, this.directionObjet, false, this.collisionObjet );
-        this.moving( axies, sens, myBackground.shadow, this.directionObjet, false, this.collisionShadow );
-      } else {
-        if ( this.spriteLink[this.liftObject.argument.indice][this.objetPosition] ){
-          this.time = 20;
-          if (this.objetPosition == 0 && linkAction.directionObjet == 'S'){
-            myBackground.item.top = parseFloat(myBackground.item.top) - this.spriteLink[this.liftObject.argument.indice][this.objetPosition].tailleY  + 'px';//modifi la position de la div pour qu'elle ne passe pas le point d'impact
-          } else {
-            if ( this.objetPosition == 0 && linkAction.directionObjet == 'N' ){myBackground.item.left = (parseFloat(myBackground.item.left) - this.spriteLink[this.liftObject.argument.indice][this.objetPosition].tailleX) + 'px';}//modifi la position de la div pour qu'elle ne passe pas le point d'impact
+        for (var i=0;(myBackground.collisionListe[myBackground.stage][i] && !linkEtat.throwObjetVerify.collisionBooleen);i++){
+          if( !this.testObstacle( axies, sens, myBackground.item, myBackground.collisionListe[myBackground.stage][i] ) ){
+            linkEtat.throwObjetVerify.collisionBooleen = 1;
           }
-          myBackground.affiche(this.spriteLink[this.liftObject.argument.indice][this.objetPosition], myBackground.item, true);
-          this.objetPosition++;
+        }
+      } else {
+        if ( this.spriteLink[this.liftObject.argument.indice][linkEtat.throwObjet.objetPosition] ){
+          this.time = 20;
+          if (linkEtat.throwObjet.objetPosition == 0 && linkAction.directionObjet == 'S'){
+            //modifi la position de la div pour qu'elle ne passe pas le point d'impact
+            myBackground.item.top = parseFloat(myBackground.item.top) - this.spriteLink[this.liftObject.argument.indice][linkEtat.throwObjet.objetPosition].tailleY  + 'px';
+          } else {
+            //modifi la position de la div pour qu'elle ne passe pas le point d'impact
+            if ( linkEtat.throwObjet.objetPosition == 0 && linkAction.directionObjet == 'N' ){myBackground.item.left = (parseFloat(myBackground.item.left) - this.spriteLink[this.liftObject.argument.indice][linkEtat.throwObjet.objetPosition].tailleX) + 'px';}
+          }
+          myBackground.affiche(this.spriteLink[this.liftObject.argument.indice][linkEtat.throwObjet.objetPosition], myBackground.item, true);
+          linkEtat.throwObjet.objetPosition++;
         }
       }
     }
-    if ( this.spriteLink[this.liftObject.argument.indice][this.objetPosition] ){
+    if ( this.spriteLink[this.liftObject.argument.indice][linkEtat.throwObjet.objetPosition] ){
       this.requestID = window.requestAnimationFrame(function(timestamp){linkAction.launch(timestamp)});
     } else {
       this.time = 20;
       myBackground.item['z-index'] = -1;
       myBackground.shadow['z-index'] = -1;
-      myBackground.item[axies] = '0px';
       window.cancelAnimationFrame(this.requestID);
     }
   },
@@ -884,11 +781,11 @@ var linkAction = {
   //mouvement du personnage
   mouvement : function(timestamp){
     if (!this.start) this.start = timestamp;
-    //initialise le temps dans le sens corespondant quand le personnage est bloqué par un obstacle
-    if ( !linkEtat.timeObstacle.leftStart && !linkEtat.collision.collisionBooleen && linkEtat.collision.direction == 'W' ) linkEtat.timeObstacle.leftStart = timestamp;
-    if ( !linkEtat.timeObstacle.rightStart && !linkEtat.collision.collisionBooleen && linkEtat.collision.direction == 'E' ) linkEtat.timeObstacle.rightStart = timestamp;
-    if ( !linkEtat.timeObstacle.topStart && !linkEtat.collision.collisionBooleen && linkEtat.collision.direction == 'N' ) linkEtat.timeObstacle.topStart = timestamp;
-    if ( !linkEtat.timeObstacle.bottomStart && !linkEtat.collision.collisionBooleen && linkEtat.collision.direction == 'S' ) linkEtat.timeObstacle.bottomStart = timestamp;
+    //initialise le temps dans le sens correspondant quand le personnage est bloqué par un obstacle
+    if ( !linkEtat.timeObstacle.leftStart && linkEtat.collision.collisionBooleen && linkEtat.collision.direction == 'W' ) linkEtat.timeObstacle.leftStart = timestamp;
+    if ( !linkEtat.timeObstacle.rightStart && linkEtat.collision.collisionBooleen && linkEtat.collision.direction == 'E' ) linkEtat.timeObstacle.rightStart = timestamp;
+    if ( !linkEtat.timeObstacle.topStart && linkEtat.collision.collisionBooleen && linkEtat.collision.direction == 'N' ) linkEtat.timeObstacle.topStart = timestamp;
+    if ( !linkEtat.timeObstacle.bottomStart && linkEtat.collision.collisionBooleen && linkEtat.collision.direction == 'S' ) linkEtat.timeObstacle.bottomStart = timestamp;
     var progress = timestamp - this.start;
     var progressLeft = timestamp - linkEtat.timeObstacle.leftStart;
     var progressRight = timestamp - linkEtat.timeObstacle.rightStart;
@@ -907,21 +804,31 @@ var linkAction = {
     if( progressBottom > 1000 && progressBottom != timestamp ){
       linkEtat.timeObstacle.supSecondeBottom = true;
     }
-    //si aucun aucun coffre ou item n'est trouvé
-    if ( !linkEtat.timeObstacle.actionObjet ){
-      if (progress > this.temps){
+    //si aucun coffre ou item n'est trouvé
+    this.menu();
+    if (progress > this.temps){
+      //vérifi si link a été touché
+      if ( ( Date.now() - linkEtat.collisionEnemi.lastFire ) < 1000 ) {
+        if ( this.divPersonnage['z-index'] == 3 ) {
+          this.divPersonnage['z-index'] = -1;
+        } else {
+          this.divPersonnage['z-index'] = 3;
+        }
+      } else {
+        this.divPersonnage['z-index'] = 3;
+      }
+      if ( linkEtat.life[0] > 0 ){
         // if ( parseFloat(this.divPersonnage.top) > 100 ){
         //   linkEtat.carac.top = parseFloat(this.divPersonnage.top) - 75 + 'px';
         // } else {
-          linkEtat.carac.top = '25px';
+        linkEtat.carac.top = '25px';
         // }
         // if ( parseFloat(this.divPersonnage.left) > 25 ){
         //   if ( parseFloat(this.divPersonnage.left) < (myBackground.divJeux.offsetWidth - 165) ){
         //     linkEtat.carac.left = parseFloat(this.divPersonnage.left) - 75 + 'px';
         //   }
         // } else {
-          linkEtat.carac.left = (myBackground.divJeux.offsetWidth - 225) + 'px';
-          this.menu();
+        linkEtat.carac.left = (myBackground.divJeux.offsetWidth - 225) + 'px';
         // }
         //vérifi si le temps est à 2s
         if( this.temps == 2000 ){
@@ -935,11 +842,12 @@ var linkAction = {
           //centre l'objet transporté par link
           myBackground.centreObjet();
         }
+        //souléve un objet
         if ( this.lastPosition > linkEtat.spritePosition.position && linkEtat.touche.keyAPlusObjet ){
           myBackground.item['z-index'] = 2;
           this.spriteSelection( linkEtat.timeObstacle.supSecondeBottom, 2, this.spriteLink[linkEtat.spritePosition.color][linkEtat.spritePosition.direction][this.walk][0], linkEtat.touche.keyAPlusObjet );
           if (this.lastPosition == linkEtat.spritePosition.position){
-            myBackground.item['z-index'] = 3;
+            myBackground.item['z-index'] = 4;
           }
         } else {
           //réinitialise la position à -1
@@ -950,11 +858,33 @@ var linkAction = {
             this.spriteDefaut(linkEtat.actionOff.sprite);
           }
         }
+      } else {
+        //repasse le z-index de link à 3
+        this.divPersonnage['z-index'] = 3;
+        //parcour le sprite du game over
+        if ( this.spriteLink[linkEtat.spritePosition.color][4][linkEtat.spritePosition.position] ){
+          this.spriteDefaut(this.spriteLink[linkEtat.spritePosition.color][4][linkEtat.spritePosition.position]);
+          linkEtat.spritePosition.position++;
+        } else {
+          this.gameOver();
+        }
       }
-    } else {
-      this.spriteDefaut(linkEtat.actionOff.sprite);
     }
+    //enregistre la position de link
+    linkEtat.sauvPositionSprite = {
+        tailleX : parseFloat(this.persoShow.width),//position en left
+        tailleY : parseFloat(this.persoShow.height),//position en top
+        positionX : parseFloat(this.divPersonnage.left) + parseFloat(this.persoShow.left),//largeur
+        positionY : parseFloat(this.divPersonnage.top) + parseFloat(this.persoShow.top),//hauteur
+        width : parseFloat(this.persoShow.width),//position en left
+        height : parseFloat(this.persoShow.height),//position en top
+        left : parseFloat(this.divPersonnage.left) + parseFloat(this.persoShow.left),//largeur
+        top : parseFloat(this.divPersonnage.top) + parseFloat(this.persoShow.top)//hauteur
+    };
     window.requestAnimationFrame(function(timestamp){linkAction.mouvement(timestamp)});
+  },
+  //gameOver
+  gameOver : function(){
   },
   //met les éléments du menu dans des objets
   creatCarac : function(){
@@ -2111,7 +2041,7 @@ var linkAction = {
       cP(-339, -188, 16, 16), //indice 17 Express - clé2
       cP(-359, -188, 16, 16), //indice 18 Angular - clé3
       cP(-379, -188, 16, 16), //indice 19 Node - clé4
-      cP(-398, -188, 16, 16), //indice 20 Meteor - arc
+      cP(-395, -186, 21, 20), //indice 20 Meteor - arc
       cP(-418, -188, 16, 16), //indice 21 Bootstrap - coeur
       cP(-439, -188, 16, 16), //indice 22 Ajax - Bombe
     ],[//indice 5 sinthiement aléatoir de l'épée haut et bas

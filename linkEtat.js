@@ -2,56 +2,61 @@
 //personage
 var linkEtat = {
   item : {
-    shield : true, //
-    sword : true, //
-    blueChainMail : false, //
-    redChainMail : false, //
-    bow : false, //
-    bomb : false,
-    glove : true,
-    heart4 : false,
-    heart5 : false
+    shield : 1, //html
+    sword : 1, //JS
+    blueChainMail : 0, //
+    redChainMail : 0, //
+    bow : 0, //Meteor
+    bomb : 0,
+    glove : 1,
+    heart4 : 0,
+    heart5 : 0
   },
   key : {
-    mongoDB : false,
-    express : false,
-    angular : false,
-    nodeJS : false
+    mongoDB : 0,
+    express : 0,
+    angular : 0,
+    nodeJS : 0
   },
   life : [4, 4, 4, 0, 0],
   //bouleen des touche appuyé
   touche : {
     direction : 'E',
     directionSword : 'E',
-    keyZ : false,
-    keyZPlusObstacle : false,
-    keyA : false,
-    keyAPlusObstacle : false,
-    keyAPlusObjet : false,
-    left : false,
-    right : false,
-    top : false,
-    bottom : false
+    keyZ : 0,
+    keyZPlusObstacle : 0,
+    keyA : 0,
+    keyAPlusObstacle : 0,
+    keyAPlusObjet : 0,
+    left : 0,
+    right : 0,
+    top : 0,
+    bottom : 0
   },
   timeObstacle : {//obstacle rencontré dans une direction
-    actionObjet : false,
-    supSecondeLeft : false,
+    actionObjet : 0,
+    supSecondeLeft : 0,
     leftStart : 0,
-    supSecondeRight : false,
+    supSecondeRight : 0,
     rightStart : 0,
-    supSecondeTop : false,
+    supSecondeTop : 0,
     topStart : 0,
-    supSecondeBottom : false,
+    supSecondeBottom : 0,
     bottomStart : 0
   },
   collision : {//valeur au moment d'une collision
-    position : 0,//position de l'élément concerné
-    collisionBooleen : true,//collision
-    tailleX : 0,//position du sprite
-    tailleY : 0,//position du sprite
-    direction : 'E'
+    position : 0,//indice de l'élément concerné
+    collisionBooleen : 0,//collision
+    direction : 0//sens au moment de la collision
   },
-  spriteMouvement : false,
+  collisionEnemi : {//valeur au moment d'une collision
+    position : 0,//indice de l'élément concerné
+    collisionBooleen : 0,//collision
+    direction : 0,//sens au moment de la collision ennemi
+    lastFire : 0,//temps depuis le dernier coup reçu
+    hit : 1 //coup reçu actif
+  },
+  spriteMouvement : 0,
   tailleSprite : 0,//calcul quand le scaleX et de -1
   slachSword : 0,
   axieSword : null,
@@ -64,6 +69,32 @@ var linkEtat = {
     color : 1,//couleur de la tenu
     direction : 2,//direction de link
     action : 0 //type d'action
+  },
+  //valeur du sens du mouvement au moment du lancé de l'objet
+  throwObjet : {
+    directionObjet : null,
+    collisionObjet : null,
+    direction : null
+  },
+  //valeur du sens du mouvement au moment du lancé de l'objet
+  throwShadow : {
+    direction : null,
+  },
+  //valeur de comparaison
+  throwObjetVerify : {
+    directionObjet : null,
+    collisionObjet : null,
+    direction : null
+  },
+  //valeur de comparaison
+  throwShadowVerify : {
+    direction : null,
+  },
+  sauvPositionSprite : {
+    positionX : 0,//position en left
+    positionY : 0,//position en top
+    tailleX : 0,//largeur
+    tailleY : 0,//hauteur
   },
   chestOpen : [[],[],[],[],[],[],[],[],[],[],[]]//liste des coffre ouvert
 };

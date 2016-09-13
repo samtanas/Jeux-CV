@@ -36,7 +36,7 @@ var myBackground = {
       //vérifi les coffres
       if( this.collisionListe[this.stage][i].argument.chest ){
         //vérifi si le coffre a été ouvert
-        if ( linkEtat.chestOpen[this.stage][i] ) { zindex = 4 }
+        if ( linkEtat.chestOpen[this.stage][i] ) { zindex = 3 }
         //ajoute une image par coffre
         typeObjet(this.collisionListe[this.stage][i],  this.decorObject[4], zindex);
       }
@@ -48,7 +48,7 @@ var myBackground = {
       //vérifi les maison
       if( this.collisionListe[this.stage][i].argument.home ){
         //ajoute pour la maison
-        typeObjet(this.collisionListe[this.stage][i],  this.decorObject[this.collisionListe[this.stage][i].argument.indice], 4);
+        typeObjet(this.collisionListe[this.stage][i],  this.decorObject[this.collisionListe[this.stage][i].argument.indice], 6);
       }
       //vérifi les objet soulevable
       if( this.collisionListe[this.stage][i].argument.lift ){
@@ -57,7 +57,7 @@ var myBackground = {
       }
       if( this.collisionListe[this.stage][i].argument.exit && this.collisionListe[this.stage][i].argument.indice ){
         //ajoute les éléments de sortie.
-        typeObjet(this.collisionListe[this.stage][i],  this.decorObject[this.collisionListe[this.stage][i].argument.indice], 4);
+        typeObjet(this.collisionListe[this.stage][i],  this.decorObject[this.collisionListe[this.stage][i].argument.indice], 6);
       }
       if( this.collisionListe[this.stage][i].argument.door ){
         //ajoute les portes.
@@ -65,7 +65,7 @@ var myBackground = {
       }
       if( this.collisionListe[this.stage][i].argument.tree ){
         //ajoute les arbres.
-        typeObjet(this.collisionListe[this.stage][i],  this.decorObject[this.collisionListe[this.stage][i].argument.indice], 4, this.collisionListe[this.stage][i].argument.url);
+        typeObjet(this.collisionListe[this.stage][i],  this.decorObject[this.collisionListe[this.stage][i].argument.indice], 6, this.collisionListe[this.stage][i].argument.url);
       }
       if( this.collisionListe[this.stage][i].argument.bomb ){
         //ajoute les zones destructible.
@@ -127,11 +127,13 @@ var myBackground = {
     this.item.height = linkAction.spriteLink[indice][nombre].tailleY + 'px';
   },
   centreObjet : function(){
-    if ( !linkAction.collisionObjet && linkEtat.slachSword != 3 ) {
+    if ( linkEtat.touche.keyAPlusObjet ) {
       this.item.left = parseFloat(linkAction.divPersonnage.left) + ((parseFloat(linkAction.divPersonnage.width) - parseFloat(this.item.width)) / 2) + 'px';
-      this.item.top = parseFloat(linkAction.divPersonnage.top) -(parseFloat(this.item.height) - 0)  + 'px';
+      this.item.top = ( parseFloat(linkAction.divPersonnage.top) - parseFloat(this.item.height) )  + 'px';
       this.shadow.left = linkAction.divPersonnage.left;
       this.shadow.top = linkAction.divPersonnage.top;
+      this.item['z-index'] = 4;
+      this.shadow['z-index'] = 1;
     }
     //scintillement de l'épée
     if ( linkEtat.slachSword == 3 ) {
@@ -151,7 +153,6 @@ var myBackground = {
           break;
       }
       this.item['z-index'] = 3;
-      this.shadow['z-index'] = 1;
     }
   },
   //affiche un objet
@@ -260,10 +261,11 @@ var myBackground = {
       for ( var k=0;this.enemiesStage[this.stage][k];k++ ){
         //reinitialise les ennemis
         this.enemiesStage[this.stage][k].modif(true);
-        this.enemiesStage[this.stage][k].tailleX = this.enemiesStage[this.stage][k].sauv.tailleX;
-        this.enemiesStage[this.stage][k].tailleY = this.enemiesStage[this.stage][k].sauv.tailleY;
-        this.enemiesStage[this.stage][k].positionX = this.enemiesStage[this.stage][k].sauv.positionX;
-        this.enemiesStage[this.stage][k].positionY = this.enemiesStage[this.stage][k].sauv.positionY;
+        this.enemiesStage[this.stage][k].tailleX = this.enemiesStage[this.stage][k].argument.sauv.tailleX;
+        this.enemiesStage[this.stage][k].tailleY = this.enemiesStage[this.stage][k].argument.sauv.tailleY;
+        this.enemiesStage[this.stage][k].positionX = this.enemiesStage[this.stage][k].argument.sauv.positionX;
+        this.enemiesStage[this.stage][k].positionY = this.enemiesStage[this.stage][k].argument.sauv.positionY;
+        this.enemiesStage[this.stage][k].life = this.enemiesStage[this.stage][k].argument.sauv.life;
         //supprime les div ennemis
         this.divJeux.removeChild(this.div[k + 1100]);
       }
@@ -282,6 +284,7 @@ var myBackground = {
       this.requestID = window.requestAnimationFrame(function(timestamp){myBackground.animation(timestamp)});
     }
     linkEtat.collision.position = null;
+    linkEtat.collision.direction = null;
   },
   start : null,
   //animation du stage
@@ -321,33 +324,329 @@ var myBackground = {
       if ( linkEtat.item.sword ){
         //parcour la liste des ennemis
         for ( var j=0;this.enemiesStage[this.stage][j];j++ ){
-          //type d'ennemis 0, 2 et 3
-          if ( this.enemiesStage[this.stage][j].argument.type == 0 || this.enemiesStage[this.stage][j].argument.type == 2 || this.enemiesStage[this.stage][j].argument.type == 3 ){
-            //positionne le sprite
-            this.positionSprite(this.div[j + 1100].style, this.image[j + 1100].style, this.enemiesListe[this.enemiesStage[this.stage][j].argument.type][this.enemiesStage[this.stage][j].argument.animation]);
-            this.enemiesStage[this.stage][j].argument.animation++;
-            if ( !this.enemiesListe[this.enemiesStage[this.stage][j].argument.type][this.enemiesStage[this.stage][j].argument.animation] ) this.enemiesStage[this.stage][j].argument.animation = 0;
-            if ( Math.abs(parseFloat(this.div[j + 1100].style.top) - parseFloat(linkAction.divPersonnage.top)) < 100 && !this.enemiesCollision[j] && Math.abs(parseFloat(this.div[j + 1100].style.left) - parseFloat(linkAction.divPersonnage.left)) < 100 ){
-              var sens = true;
-              if ( parseFloat(this.div[j + 1100].style.top) - parseFloat(linkAction.divPersonnage.top) > 0 ) sens = false;
-              //axe/* x ou y */, sens /* positif ou negatif */, div /* element en mouvement */, direction /* direction au moment de l'impact */, link
-              linkAction.moving('top', sens, this.div[j + 1100].style, sens, null, j);
-              if ( parseFloat(this.div[j + 1100].style.left) - parseFloat(linkAction.divPersonnage.left) > 0 ) sens = false;
-              else sens = true;
-              linkAction.moving('left', sens, this.div[j + 1100].style, sens, null, j);
-            }
+          var sprite;
+          mouvement = 1;
+          //vérifie si l'ennemi a encore de la vie
+          if ( this.enemiesStage[this.stage][j].argument.life <= 0 ) {
+            //supression de l'ennemi tué
+            this.collisionListe[this.stage][j].modif(false);
+            this.div[j + 1100].style['z-index'] = -1;
+            this.div[j + 1100].style.top = '-1000px';
           }
-          //sauvegarde la position des ennemis
-          this.enemiesStage[this.stage][j].tailleX = parseFloat(this.div[j + 1100].style.width);
-          this.enemiesStage[this.stage][j].tailleY = parseFloat(this.div[j + 1100].style.width);
-          this.enemiesStage[this.stage][j].positionX = parseFloat(this.div[j + 1100].style.left);
-          this.enemiesStage[this.stage][j].positionY = parseFloat(this.div[j + 1100].style.top);
+          //vérifi que l'ennemi est vivant
+          if ( this.enemiesStage[this.stage][j].existance() && this.enemiesStage[this.stage][j].argument.life > 0 ){
+            //vérifi si l'ennemi a été touché pour le faire clignoter
+            if ( ( !this.enemiesStage[this.stage][j].argument.hit ) && ( ( Date.now() - this.enemiesStage[this.stage][j].argument.lastFire ) < 500 ) ) {
+              if ( this.div[j + 1100].style['z-index'] == 1 ) {
+                this.div[j + 1100].style['z-index'] = -1;
+              } else {
+                this.div[j + 1100].style['z-index'] = 1;
+              }
+            } else {
+              this.enemiesStage[this.stage][j].argument.hit = 1;
+              this.div[j + 1100].style['z-index'] = 1;
+            }
+            //type d'ennemis 0, 2 et 3
+            if ( this.enemiesStage[this.stage][j].argument.type == 0 || this.enemiesStage[this.stage][j].argument.type == 2 || this.enemiesStage[this.stage][j].argument.type == 3 ){
+              this.enemiesStage[this.stage][j].argument.animation++;
+              //réinitialise la postion du sprite
+              if ( !this.enemiesListe[this.enemiesStage[this.stage][j].argument.type][this.enemiesStage[this.stage][j].argument.animation] ) this.enemiesStage[this.stage][j].argument.animation = 0;
+              sprite = this.enemiesListe[this.enemiesStage[this.stage][j].argument.type][this.enemiesStage[this.stage][j].argument.animation];
+              this.enemiesStage[this.stage][j].argument.visibly = this.enemiesStage[this.stage][j].argument.way.direction;
+            }
+            //type d'ennemis 4
+            if ( this.enemiesStage[this.stage][j].argument.type == 4 ){
+              if ( this.enemiesStage[this.stage][j].argument.aggro ||  Date.now() - this.enemiesStage[this.stage][j].argument.delay < 1000 ){
+                if( !this.enemiesStage[this.stage][j].argument.animation.position ){
+                  this.enemiesStage[this.stage][j].argument.animation.position++;
+                } else {
+                  this.enemiesStage[this.stage][j].argument.animation.position = 0;
+                }
+                this.enemiesStage[this.stage][j].argument.way.visibly = this.enemiesStage[this.stage][j].argument.way.direction;
+              } else {
+                if ( Date.now() - this.enemiesStage[this.stage][j].argument.delay < 1500) {
+                  this.enemiesStage[this.stage][j].argument.animation.position = 2;
+                  //bloque le mouvement
+                  mouvement = 0;
+                } else {
+                  if ( Date.now() - this.enemiesStage[this.stage][j].argument.delay < 2000) {
+                    //bloque le mouvement
+                    mouvement = 0;
+                    this.enemiesStage[this.stage][j].argument.animation.position = 3;
+                  } else {
+                    this.enemiesStage[this.stage][j].argument.delay = Date.now();
+                  }
+                }
+              }
+              //vérifi la direction pour positionné le sprite correspondant
+              switch ( this.enemiesStage[this.stage][j].argument.way.direction ) {
+                case 'N':
+                  this.enemiesStage[this.stage][j].argument.animation.sens = 3;
+                  if(this.enemiesStage[this.stage][j].argument.animation.position == 2){
+                    this.enemiesStage[this.stage][j].argument.visibly = 'W';
+                  } else {
+                    if (this.enemiesStage[this.stage][j].argument.animation.position == 3) {
+                      this.enemiesStage[this.stage][j].argument.visibly = 'E';
+                    }
+                  }
+                  break;
+                case 'S':
+                  this.enemiesStage[this.stage][j].argument.animation.sens = 0;
+                  if(this.enemiesStage[this.stage][j].argument.animation.position == 2){
+                    this.enemiesStage[this.stage][j].argument.visibly = 'E';
+                  } else {
+                    if (this.enemiesStage[this.stage][j].argument.animation.position == 3) {
+                      this.enemiesStage[this.stage][j].argument.visibly = 'W';
+                    }
+                  }
+                  break;
+                case 'W':
+                  this.enemiesStage[this.stage][j].argument.animation.sens = 2;
+                  if(this.enemiesStage[this.stage][j].argument.animation.position == 2){
+                    this.enemiesStage[this.stage][j].argument.visibly = 'S';
+                  } else {
+                    if (this.enemiesStage[this.stage][j].argument.animation.position == 3) {
+                      this.enemiesStage[this.stage][j].argument.visibly = 'N';
+                    }
+                  }
+                  break;
+                case 'E':
+                  this.enemiesStage[this.stage][j].argument.animation.sens = 1;
+                  if(this.enemiesStage[this.stage][j].argument.animation.position == 2){
+                    this.enemiesStage[this.stage][j].argument.visibly = 'N';
+                  } else {
+                    if (this.enemiesStage[this.stage][j].argument.animation.position == 3) {
+                      this.enemiesStage[this.stage][j].argument.visibly = 'S';
+                    }
+                  }
+                  break;
+              }
+              sprite = this.enemiesListe[this.enemiesStage[this.stage][j].argument.type][this.enemiesStage[this.stage][j].argument.animation.sens][this.enemiesStage[this.stage][j].argument.animation.position];
+            }
+            //positionne le sprite
+            this.positionSprite(this.div[j + 1100].style, this.image[j + 1100].style, sprite);
+            //test la zone d'aggro
+            if (!this.enemiesStage[this.stage][j].argument.aggro || Date.now() - this.enemiesStage[this.stage][j].argument.lastAggro > 2000 ) { this.aggro(this.enemiesStage[this.stage][j], j); }
+            //vérifi si link est à moins de 20px ou si il a été vue
+            if ( ( Math.abs(parseFloat(this.div[j + 1100].style.top) - parseFloat(linkAction.divPersonnage.top)) < 20 && !this.enemiesCollision[j] && Math.abs(parseFloat(this.div[j + 1100].style.left) - parseFloat(linkAction.divPersonnage.left)) < 20 ) || this.enemiesStage[this.stage][j].argument.aggro ){
+              var sens = 1;
+              var direction = 'S';
+              if ( parseFloat(this.div[j + 1100].style.top) - parseFloat(linkAction.divPersonnage.top) > 0 ) {
+                sens = 0;
+                direction = 'N';
+              }
+              this.enemiesStage[this.stage][j].argument.way.direction = direction;
+              //test si une collision a lieu avec un obstacle ou avec link dans le sens top
+              linkAction.moving('top', sens, this.div[j + 1100].style, this.collisionListe[this.stage], direction, this.enemiesStage[this.stage][j], 0, linkEtat.sauvPositionSprite, this.enemiesStage[this.stage][j].argument.collisionLink);
+              linkAction.moving('top', sens, this.div[j + 1100].style, this.collisionListe[this.stage], direction, this.enemiesStage[this.stage][j], 0, linkEtat.sauvPositionSprite, this.enemiesStage[this.stage][j].argument.collisionLink);
+              if ( this.enemiesStage[this.stage][j].argument.collisionLink.collisionBooleen  && ( ( Date.now() - this.enemiesStage[this.stage][j].argument.lastFire ) > 500 ) ){
+                this.hit(j);
+              }
+              if ( parseFloat(this.div[j + 1100].style.left) - parseFloat(linkAction.divPersonnage.left) > 0 ) {
+                sens = 0;
+                direction = 'W';
+              } else {
+                sens = 1;
+                direction = 'E';
+              }
+              if ( ( Math.abs(parseFloat(this.div[j + 1100].style.top) - parseFloat(linkAction.divPersonnage.top)) < Math.abs(parseFloat(this.div[j + 1100].style.left) - parseFloat(linkAction.divPersonnage.left)) ) ){
+                this.enemiesStage[this.stage][j].argument.way.direction = direction;
+              }
+              //test si une collision a lieu avec un obstacle ou avec link dans le sens left
+              linkAction.moving('left', sens, this.div[j + 1100].style, this.collisionListe[this.stage], direction, this.enemiesStage[this.stage][j], 0, linkEtat.sauvPositionSprite, this.enemiesStage[this.stage][j].argument.collisionLink);
+              linkAction.moving('left', sens, this.div[j + 1100].style, this.collisionListe[this.stage], direction, this.enemiesStage[this.stage][j], 0, linkEtat.sauvPositionSprite, this.enemiesStage[this.stage][j].argument.collisionLink);
+              if ( this.enemiesStage[this.stage][j].argument.collisionLink.collisionBooleen && ( ( Date.now() - this.enemiesStage[this.stage][j].argument.lastFire ) > 500 ) ){
+                this.hit(j);
+              }
+            } else {
+              if ( mouvement ){
+                this.moving(this.enemiesStage[this.stage][j], j);
+              }
+            }
+            //sauvegarde la position des ennemis
+            this.enemiesStage[this.stage][j].tailleX = parseFloat(this.div[j + 1100].style.width);
+            this.enemiesStage[this.stage][j].tailleY = parseFloat(this.div[j + 1100].style.width);
+            this.enemiesStage[this.stage][j].positionX = parseFloat(this.div[j + 1100].style.left);
+            this.enemiesStage[this.stage][j].positionY = parseFloat(this.div[j + 1100].style.top);
+          } else {
+            this.enemiesStage[this.stage][j].positionY = parseFloat(this.div[j + 1100].style.top);
+            this.div[j + 1100].style['z-index'] = -1;
+          }
         }
       }
     }
     this.requestID = window.requestAnimationFrame(function(timestamp){myBackground.animation(timestamp)});
   },
+  //zone de vue des monstre
+  aggro : function(enemi, indice){
+    //objet de zone de vue
+    var withinSight;
+    //présence de link ou non
+    var linkPresent = 0;
+    var iteration;
+    //distance entre link et l'ennemi
+    var distance;
+    var tan;
+    //calcul de la tangante
+    if ( enemi.argument.visibly == 'N' || enemi.argument.visibly == 'S' ) {
+      tan =  ( ( enemi.positionX + ( enemi.tailleX / 2 ) ) - ( linkEtat.sauvPositionSprite.positionX + ( linkEtat.sauvPositionSprite.tailleX / 2 ) ) ) / ( ( enemi.positionY + ( enemi.tailleY / 2 ) ) - (linkEtat.sauvPositionSprite.positionY + ( linkEtat.sauvPositionSprite.tailleY / 2 ) )) ;
+    } else {
+      tan = ( ( enemi.positionY + ( enemi.tailleY / 2 ) ) - ( linkEtat.sauvPositionSprite.positionY + ( linkEtat.sauvPositionSprite.tailleY / 2 ) ) ) / ( ( enemi.positionX + ( enemi.tailleX / 2 ) ) - ( linkEtat.sauvPositionSprite.positionX + ( linkEtat.sauvPositionSprite.tailleX / 2 ) ) );
+    }
+    //verifi le sens pour implémenter la variable
+    switch (enemi.argument.visibly) {
+      case 'N':
+        //verifi si le personnage est à moins de 100px et qu'il n'est pas derière et dans un angle 45° a droite et à gauche
+        if ( ( enemi.positionY <= ( linkEtat.sauvPositionSprite.positionY - linkEtat.sauvPositionSprite.tailleY + 100 )) && (enemi.positionY >= linkEtat.sauvPositionSprite.positionY) && ( Math.atan(tan) < 0.785398 ) && ( Math.atan(tan) > -0.785398 ) ){
+          linkPresent = 1;
+          withinSight = {
+            left : enemi.positionX,
+            top : enemi.positionY,
+            width : enemi.tailleX,
+            height : 1
+          };
+          iteration = -1;
+          ditance = enemi.positionY - ( linkEtat.sauvPositionSprite.positionY + linkEtat.sauvPositionSprite.tailleY )
+        }
+        break;
+      case 'S':
+        if( ( enemi.positionY + enemi.tailleY >= ( linkEtat.sauvPositionSprite.positionY - 100 ) ) && ( ( enemi.positionY + enemi.tailleY ) <= ( linkEtat.sauvPositionSprite.positionY - linkEtat.sauvPositionSprite.tailleY ) ) && ( Math.atan(tan) < 0.785398 ) && ( Math.atan(tan) > -0.785398 ) ){
+          linkPresent = 1;
+          withinSight = {
+            left : enemi.positionX,
+            top : enemi.positionY + enemi.tailleY,
+            width : enemi.tailleX,
+            height : 1
+          };
+          iteration = 1;
+          distance = linkEtat.sauvPositionSprite.positionY - ( enemi.positionY + enemi.tailleY );
+        }
+        break;
+      case 'W':
+        if( ( (enemi.positionX <= ( linkEtat.sauvPositionSprite.positionX + linkEtat.sauvPositionSprite.tailleX + 100 ) ) ) && ( enemi.positionX >= linkEtat.sauvPositionSprite.positionX ) && (enemi.positionY >= linkEtat.sauvPositionSprite.positionY) && ( Math.atan(tan) < 0.785398 ) && ( Math.atan(tan) > -0.785398 ) ){
+          linkPresent = 1;
+          withinSight = {
+            left : enemi.positionX,
+            top : enemi.positionY,
+            width : 1,
+            height : enemi.tailleY
+          };
+          iteration = -1;
+          distance = enemi.positionX - ( linkEtat.sauvPositionSprite.positionX + linkEtat.sauvPositionSprite.tailleX );
+        }
+        break;
+      case 'E':
+        if( ( ( enemi.positionX + enemi.tailleX ) >= ( linkEtat.sauvPositionSprite.positionX - 100 ) ) && ( ( enemi.positionX + enemi.tailleX ) <= ( linkEtat.sauvPositionSprite.positionX + linkEtat.sauvPositionSprite.tailleX ) )  && ( Math.atan(tan) < 0.785398 ) && ( Math.atan(tan) > -0.785398 ) ){
+          linkPresent = 1;
+          withinSight = {
+            left : enemi.positionX + enemi.tailleX,
+            top : enemi.positionY,
+            width : 1,
+            height : enemi.tailleY
+          };
+          iteration = 1;
+          distance = linkEtat.sauvPositionSprite.positionX - ( enemi.positionX + enemi.tailleX );
+        }
+        break;
+
+    }
+    //si link est à moins de 100px et dans un angle de 45° lance la boucle
+    if(linkPresent){
+      //boucle la ligne de vue entre link et l'enemi pour voir si un obstacle est présent
+      for (var i=0;i<distance;i++){
+        //boucle les obstacles
+        for ( var j=0;this.collisionListe[this.stage][j];j++){
+          //si un obstacle est rencontré sort de la boucle
+          if(!linkAction.testObstacle(enemi.argument.way.axies, enemi.argument.way.sens, withinSight, this.collisionListe[this.stage][j])){
+            enemi.argument.aggro = 0;
+            return false;
+          }
+        }
+        if ( enemi.argument.visibly == 'N' || enemi.argument.visibly == 'S' ){
+          withinSight.left += tan;
+          withinSight.top += iteration;
+        } else {
+          withinSight.left += iteration;
+          withinSight.top += tan;
+        }
+      }
+      //si tous les test sont fini link est bien visible
+      enemi.argument.lastAggro = Date.now();
+      enemi.argument.aggro = 1;
+      return true;
+    } else {
+      //si link est à plus de 100px sort de la boucle ou derrière
+      enemi.argument.aggro = 0;
+      return false;
+    }
+  },
+  hit : function(indice){
+    var sensPlusCoup = 0;
+    //vérifie si link est dans le même sens
+    if ( !( ( linkEtat.touche.direction == 'S' && this.enemiesStage[this.stage][indice].argument.way.direction == 'N' ) || ( linkEtat.touche.direction == 'E' && this.enemiesStage[this.stage][indice].argument.way.direction == 'W' ) ) ) {
+      sensPlusCoup = 1;
+    } else {
+      //vérifi si il donne un coup d'épée
+      if ( linkEtat.slachSword != 0 ) sensPlusCoup = 1;
+    }
+    //vérifie si link a été touché ou l'ennemi
+    if ( ( ( Date.now() - linkEtat.collisionEnemi.lastFire ) > 1000 ) && linkEtat.slachSword != 4 && sensPlusCoup ){
+      linkAction.touche(this.enemiesStage[this.stage][indice].argument.damage);
+      linkEtat.collisionEnemi.lastFire = Date.now();
+    } else {
+      if ( linkEtat.slachSword ){
+        this.enemiesStage[this.stage][indice].argument.life--;
+        this.enemiesStage[this.stage][indice].argument.lastFire = Date.now();
+      }
+    }
+  },
   enemiesCollision : [],
+  //ronde de l'ennemi
+  moving : function(enemi, indice){
+    //vérifi le sens pour changer la direction
+    switch (enemi.argument.way.direction) {
+      case 'N':
+        if (enemi.argument.path.positionY <= enemi.positionY){
+          //test si une collision a lieu avec un obstacle
+          linkAction.moving( 'top', 0, this.div[indice + 1100].style, this.collisionListe[this.stage], 'N', enemi );
+        } else {
+          enemi.argument.way.axies = 'left';
+          enemi.argument.way.sens = 0;
+          enemi.argument.way.direction = 'W';
+        }
+        break;
+      case 'W':
+        if (enemi.argument.path.positionX <= enemi.positionX){
+          //test si une collision a lieu avec un obstacle
+          linkAction.moving( 'left', 0, this.div[indice + 1100].style, this.collisionListe[this.stage], 'W', enemi );
+        } else {
+          enemi.argument.way.axies = 'top';
+          enemi.argument.way.sens = 1;
+          enemi.argument.way.direction = 'S';
+        }
+        break;
+      case 'S':
+        if ( (enemi.argument.path.positionY + enemi.argument.path.tailleY) >= (enemi.positionY + enemi.tailleY) ){
+          //test si une collision a lieu avec un obstacle
+          linkAction.moving( 'top', 1, this.div[indice + 1100].style, this.collisionListe[this.stage], 'S', enemi );
+        } else {
+          enemi.argument.way.axies = 'left';
+          enemi.argument.way.sens = 1;
+          enemi.argument.way.direction = 'E';
+        }
+        break;
+      case 'E':
+        if ( (enemi.argument.path.positionX + enemi.argument.path.tailleX) >= (enemi.positionX + enemi.tailleX) ){
+          //test si une collision a lieu avec un obstacle
+          linkAction.moving( 'left', 1, this.div[indice + 1100].style, this.collisionListe[this.stage], 'E', enemi );
+        } else {
+          enemi.argument.way.axies = 'top';
+          enemi.argument.way.sens = 0;
+          enemi.argument.way.direction = 'N';
+        }
+        break;
+    }
+  },
   positionSprite : function(div, img, sprite){
     div.width = sprite.tailleX + 'px';//largeur de l'image visible
     div.height = sprite.tailleY + 'px';//hauteur de l'image visible
@@ -1379,22 +1678,22 @@ var myBackground = {
   div : [],
   save : [],
   enemiesListe : [[//indice 0 Popo
-      cP(-263, -495, 16, 16),
-      cP(-282, -494, 16, 17),
-      cP(-302, -494, 16, 17),
+      cP(-261, -495, 16, 16),
+      cP(-280, -494, 16, 17),
+      cP(-300, -494, 16, 17),
     ],[//indice 1 rat
-      cP(-263, -516, 12, 16),//vers le bas
-      cP(-293, -518, 16, 11),//vers la gauche marche
-      cP(-311, -517, 12, 15),//vers le bas marche
-      cP(-277, -518, 16, 12),//vers la gauche
-      cP(-326, -516, 15, 16),//se redresse
-      cP(-341, -516, 15, 16)//se redresse
+      cP(-261, -516, 12, 16),//vers le bas
+      cP(-291, -518, 16, 11),//vers la gauche marche
+      cP(-309, -517, 12, 15),//vers le bas marche
+      cP(-275, -518, 16, 12),//vers la gauche
+      cP(-324, -516, 15, 16),//se redresse
+      cP(-339, -516, 15, 16)//se redresse
     ],[//indice 2 leever
-      cP(-323, -494, 16, 17),
-      cP(-343, -494, 14, 17)
+      cP(-321, -494, 16, 17),
+      cP(-341, -494, 14, 17)
     ],[//indice 3 leever
-      cP(-363, -494, 16, 17),
-      cP(-383, -494, 14, 17)
+      cP(-361, -494, 16, 17),
+      cP(-381, -494, 14, 17)
     ],[//indice 4 soldier
       [//indice 0 de face
         cP(-263, -537, 16, 28),//marche
@@ -1411,7 +1710,7 @@ var myBackground = {
         cP(-450, -537, 18, 28),//marche
         cP(-472, -537, 17, 28),//regade vers le bas
         cP(-493, -537, 17, 28)//regade vers le haut
-      ],[//indice 1 vers le haut
+      ],[//indice 3 vers le haut
         cP(-512, -537, 16, 29),//marche
         cP(-532, -537, 16, 28),//marche
         cP(-552, -537, 16, 28),//regade vers la gauche
@@ -1421,16 +1720,16 @@ var myBackground = {
   ],
   enemiesStage : [[//indice 0 pas d'ennemi
     ],[//indice 1 zone de la maison
-      cP(354, 385, 16, 16, {type : 0, animation : 0, life : 2, damage : 2, sauv : cP(354, 385, 16, 16)} ),
-      cP(320, 89, 16, 16, {type : 0, animation : 0, life : 2, damage : 2, sauv : cP(320, 89, 16, 16)} ),
-      cP(77, 394, 16, 16, {type : 0, animation : 0, life : 2, damage : 2, sauv : cP(77, 394, 16, 16)} )
+      cP(354, 385, 16, 16, cE1(4,cP(354, 385, 16, 16),cP(329, 117, 50, 200)) ),
+      cP(320, 89, 16, 16, cE1(4,cP(320, 89, 16, 16),cP(200, 20, 200, 100)) ),
+      cP(77, 394, 16, 16, cE1(4,cP(77, 394, 16, 16),cP(25, 385, 200, 25)) ),
     ],[//indice 2 foret
     ],[//indice 3 foret
     ],[//indice 4
     ],[//indice 5 foret couloir
-      cP(116, 108, 16, 16, {type : 0, animation : 0, life : 2, damage : 2}),
-      cP(77, 201, 16, 16, {type : 0, animation : 0, life : 2, damage : 2}),
-      cP(141, 357, 16, 16, {type : 0, animation : 0, life : 2, damage : 2})
+      cP(116, 108, 16, 16, cE0(0,cP(116, 108, 16, 16),cP(0,0,0,0)) ),
+      cP(77, 201, 16, 16, cE0(0,cP(116, 108, 16, 16),cP(0,0,0,0)) ),
+      cP(141, 357, 16, 16, cE0(0,cP(116, 108, 16, 16),cP(0,0,0,0)) )
     ],[//indice 6
     ],[//indice 7
     ],[//indice 8
