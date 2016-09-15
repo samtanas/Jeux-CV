@@ -70,7 +70,7 @@ var cE1 = (function(){
       position:0
     };
     this.life = 2;
-    this.damage = 2;
+    this.damage = 4;
     this.hit = 1;
     //temps depuis le denier coup reçu
     this.lastFire = 0;

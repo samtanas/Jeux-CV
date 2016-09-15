@@ -48,42 +48,201 @@ table {
 }
 @font-face {
     font-family: 'return_of_ganonregular';
-    src: url('../font/returnofganon-webfont.eot');
-    src: url('../font/returnofganon-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../font/returnofganon-webfont.woff2') format('woff2'),
-         url('../font/returnofganon-webfont.woff') format('woff');
+    src: url('font/returnofganon-webfont.eot');
+    src: url('font/returnofganon-webfont.eot?#iefix') format('embedded-opentype'),
+         url('font/returnofganon-webfont.woff2') format('woff2'),
+         url('font/returnofganon-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
-
+}
+ul{
+	width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+li {
+  background: grey ;
+  color: #fff ;
+  border: 1px solid #600 ;
+  margin-bottom: 1px ;
+}
+a{
+  display: block ;
+  background: grey ;
+  color: #fff ;
+  font: 1em "return_of_ganonregular",Arial,sans-serif ;
+  line-height: 1em ;
+  text-align: center ;
+  text-decoration: none ;
+  padding: 4px 0 ;
+}
+section{
+	top: 10%;
+	width: 100%;
+	height: 10%;
 }
 #view{
-  overflow: hidden;
+	z-index: 2;
+	top :45%;
+	left :40%;
+	width: 256px;
+	height: 223px;
+	overflow: hidden;
+	position: absolute;
+	transform: scale(2, 2);
+}
+#jeux{
+	overflow: hidden;
   position: absolute;
-  top :15%;
-  left :30%;
 }
 #show{
   position: relative;
   overflow: hidden;
 	z-index: 2;
 }
-#limitePersonnage, #objet, #spriteLink, #spriteObjet, #heart0, #heart1, #heart2, #heart3, #heart4, #life0, #life1, #life2, #life3, #life4, #carac, #shadow, #spriteShadow{
+#limitePersonnage, #objet, #spriteLink, #spriteObjet, #heart0, #heart1, #heart2, #heart3, #heart4, #heart5, #life0, #life1, #life2, #life3, #life4, #life5, #carac, #shadow, #spriteShadow, #circle, #circleView, #text, #backgroundFirst, #win{
   position: absolute;
 }
-#objet, #carac, #life0, #life1, #life2, #life3, #life4, #shadow{
+#objet, #carac, #life0, #life1, #life2, #life3, #life4, #life5, #shadow, #circleView{
   overflow: hidden;
 }
-#life0, #life1, #life2, #carac{
-  z-index: 4;
+#life0, #life1, #life2, #carac, #life3, #life4, #life5, #circleView, #text{
+  z-index: 7;
 }
-#life3, #life4, #shadow, #objet, #spriteObjet{
-  z-index: -1;
+#shadow{
+	z-index: 1;
+}
+#objet{
+	z-index: 2;
 }
 #carac{
   width: 200px;
   height: 50px;
+	top: 25px;
+	left: 25px;
 }
 #shadow{
 	width: 16px;
   height: 16px;
+}
+#text{
+	z-index: 8;
+	background: url('image/Link.png') no-repeat -49px -672px;
+	width: 190px;
+	height: 62px;
+	top: 50px;
+	left: 25px;
+}
+#win{
+	z-index: 2;
+	background: url('image/YouWin.png') no-repeat;
+	width: 486px;
+	height: 364px;
+	top :34%;
+	left :33%;
+}
+#commande{
+	z-index: 2;
+	position: absolute;
+	top: 5%;
+	left: 35%;
+	background: url('image/Link.png') no-repeat -270px -657px;
+	width: 375px;
+	height: 176px;
+}
+#message{
+	margin: 10px;
+	font-size : 0.8em;
+	font-family: 'return_of_ganonregular', sans-serif;
+}
+#commande p{
+	margin: 5px 10px;
+	font-size : 1em;
+	font-family: 'return_of_ganonregular', sans-serif;
+}
+#commande h2{
+	padding: 10px 0 0 15px;
+	font-size : 1.2em;
+	font-family: 'return_of_ganonregular', sans-serif;
+}
+#competences{
+	position: absolute;
+	top: 80%;
+	left: 10%;
+	border: 1px solide black;
+	width: 85%;
+  height: 20%;
+	z-index: 2;
+}
+#competences div{
+	overflow: hidden;
+	float: left;
+	margin: 5px;
+	opacity: 0;
+}
+#competence1{
+	background: url('image/skill.png') no-repeat -150px -30px;
+	width: 87px;
+	height: 98px;
+}
+#competence2{
+	background: url('image/skill.png') no-repeat -240px -30px;
+	width: 87px;
+	height: 98px;
+}
+#competence3{
+	background: url('image/skill.png') no-repeat -329px -30px;
+	width: 87px;
+	height: 98px;
+}
+#competence4{
+	background: url('image/skill.png') no-repeat -422px -33px;
+	width: 93px;
+	height: 93px;
+}
+#competence5{
+	background: url('image/skill.png') no-repeat -31px -177px;
+	width: 84px;
+	height: 84px;
+}
+#competence6{
+	background: url('image/skill.png') no-repeat -138px -177px;
+	width: 84px;
+	height: 83px;
+}
+#competence7{
+	background: url('image/skill.png') no-repeat -252px -172px;
+	width: 90px;
+	height: 93px;
+}
+#competence8{
+	background: url('image/skill.png') no-repeat -383px -149px;
+	width: 88px;
+	height: 96px;
+}
+#competence9{
+	background: url('image/skill.png') no-repeat -489px -152px;
+	width: 86px;
+	height: 97px;
+}
+#competence10{
+	background: url('image/skill.png') no-repeat -602px -147px;
+	width: 83px;
+	height: 89px;
+}
+#competence11{
+	background: url('image/skill.png') no-repeat -743px -146px;
+	width: 89px;
+	height: 93px;
+}
+#competence12{
+	background: url('image/skill.png') no-repeat -25px -23px;
+	width: 92px;
+	height: 90px;
+}
+#competence13{
+	background: url('image/skill.png') no-repeat -519px -22px;
+	width: 236px;
+	height: 103px;
 }

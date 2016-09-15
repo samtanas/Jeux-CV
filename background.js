@@ -2,19 +2,72 @@ var myBackground = {
   requestID : 0,
   compteur : 0,
   stage : 0,
+  loading : function(item, key){
+    this.divJeux = document.getElementById('jeux');
+    this.divView = document.getElementById('view');
+    this.divCircle = document.getElementById('circleView').style;
+    this.divCircle.opacity = 0;
+    this.divWin = document.getElementById('win').style;
+    this.divWin.opacity = 0;
+    this.imgCircle = document.getElementById('circle').style;
+    this.imgCircle.left = '-1000px';
+    this.zone = document.getElementById('background');
+    this.text = document.getElementById('text').style;
+    this.message = document.getElementById('message');
+    window.linkEtat = new ConstructeurLinkEtat(item, key);
+    //vérifi si le stage a déjà été initalisé
+    if ( !linkAction.resetGame ) this.creatImage(0);
+    // div de la limite du personnage pour les collision
+    linkAction.divPersonnage = document.getElementById('limitePersonnage').style;
+  	linkAction.divPersonnage.top = '34px';
+    linkAction.divPersonnage.left = '73px';
+    linkAction.divPersonnage.width = '14px';
+    linkAction.divPersonnage.height = '16px';
+    // image visible du personnage
+    linkAction.persoShow = document.getElementById('show').style;
+    // positionnement du sprite
+    linkAction.linkSprite = document.getElementById('spriteLink');
+    linkEtat.actionOff.sprite = linkAction.spriteLink[1][2][0][3];
+    // div des objet
+    this.item = document.getElementById('objet').style;
+    // image des objet
+    this.spriteObjet = document.getElementById('spriteObjet').style;
+    // div de l'ombre
+    this.shadow = document.getElementById('shadow').style;
+    // image de l'ombre
+    document.getElementById('spriteShadow').style.top = '-22px';
+    document.getElementById('spriteShadow').style.left = '-1081px';
+    //parcour les div des compétence
+    for (var i = 0; i < window.document.getElementById('competences').getElementsByTagName('div').length; i++) {
+      this.listeOfSkill[i] = window.document.getElementById('competences').getElementsByTagName('div')[i].style;
+    }
+    // div des caractéristique
+    linkEtat.carac = document.getElementById('carac').style;
+    //création des caractéistique affiché
+    linkAction.creatCarac();
+    linkAction.menu();
+    //mouvement du personnage
+    window.requestAnimationFrame(function(timestamp){linkAction.mouvement(timestamp)});
+    //message début
+    linkAction.counterMessage = 0;
+    linkAction.messageLoading = this.arrayMessage[0];
+    linkAction.textProgress = 1;
+    linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)});
+  },
+  listeOfSkill : [],
   //ajoute l'image de fond et les élément du décor
   creatImage : function (){
     //image de fond
     this.zone.src = this.backgroundListe[this.stage];
     //ajoute une div est une image
-    var typeObjet = function (element, type, index, url){
-      var image = document.createElement('img');
-      image.id = 'image' + myBackground.compteur;
+    var typeObjet = function (id, element, type, opacity, url, zindex){
+      var image = new Image();
       image.style.position = 'absolute';
-      element.id = myBackground.compteur;
-      image.src = url || '../image/link/link.png';
+      image.id = 'image' + id;
+      element.id = id;
+      image.src = url || 'image/Link.png';
       var div = document.createElement('div');
-      div.id = 'div' + myBackground.compteur;
+      div.id = 'div' + id;
       image.style.left = type.positionX + 'px';
       image.style.top = type.positionY + 'px';
       div.style.left = (element.argument.decallageX || element.positionX) + 'px';
@@ -26,55 +79,61 @@ var myBackground = {
       div.style.position = 'absolute';
       div.appendChild(image);
       myBackground.divJeux.appendChild(div);
-      div.style['z-index'] = index || -1;
-      myBackground.image[myBackground.compteur] = document.getElementById('image' + myBackground.compteur);
-      myBackground.div[myBackground.compteur] = document.getElementById('div' + myBackground.compteur);
+      div.style.opacity = opacity || 0;
+      div.style['z-index'] = zindex || 1;
+      myBackground.image[id] = document.getElementById('image' + id);
+      myBackground.div[id] = document.getElementById('div' + id);
     };
     //parcour les éléments du décor interactif
-    for(var i=0;this.collisionListe[this.stage][i];i++){
-      var zindex = -1;
+    while(this.collisionListe[this.stage][this.compteur]){
+      var opacity = 0;
       //vérifi les coffres
-      if( this.collisionListe[this.stage][i].argument.chest ){
+      if( this.collisionListe[this.stage][this.compteur].argument.chest ){
         //vérifi si le coffre a été ouvert
-        if ( linkEtat.chestOpen[this.stage][i] ) { zindex = 3 }
+        if ( linkEtat.chestOpen[this.stage][this.compteur] ) { opacity = 1 }
         //ajoute une image par coffre
-        typeObjet(this.collisionListe[this.stage][i],  this.decorObject[4], zindex);
+        typeObjet(this.compteur, this.collisionListe[this.stage][this.compteur],  this.decorObject[4], opacity);
+      }
+      //vérifi les entré cachet
+      if( this.collisionListe[this.stage][this.compteur].argument.push ){
+        //ajoute une image de la stelle
+        typeObjet(this.compteur, this.collisionListe[this.stage][this.compteur],  this.decorObject[24], 1, 0, 1);
       }
       //vérifi les items
-      if( this.collisionListe[this.stage][i].argument.treasure && !linkEtat.chestOpen[this.stage][i] ){
+      if( this.collisionListe[this.stage][this.compteur].argument.treasure && !linkEtat.chestOpen[this.stage][this.compteur] ){
         //ajoute une image par items
-        typeObjet(this.collisionListe[this.stage][i],  linkAction.spriteLink[4][this.collisionListe[this.stage][i].argument.item], 3);
+        typeObjet(this.compteur, this.collisionListe[this.stage][this.compteur],  linkAction.spriteLink[4][this.collisionListe[this.stage][this.compteur].argument.item], 1);
       }
       //vérifi les maison
-      if( this.collisionListe[this.stage][i].argument.home ){
+      if( this.collisionListe[this.stage][this.compteur].argument.home ){
         //ajoute pour la maison
-        typeObjet(this.collisionListe[this.stage][i],  this.decorObject[this.collisionListe[this.stage][i].argument.indice], 6);
+        typeObjet(this.compteur, this.collisionListe[this.stage][this.compteur],  this.decorObject[this.collisionListe[this.stage][this.compteur].argument.indice], 1, 0, 6);
       }
       //vérifi les objet soulevable
-      if( this.collisionListe[this.stage][i].argument.lift ){
+      if( this.collisionListe[this.stage][this.compteur].argument.lift ){
         //ajoute une image par élément soulevable
-        typeObjet(this.collisionListe[this.stage][i],  this.decorObject[this.collisionListe[this.stage][i].argument.indice]);
+        typeObjet(this.compteur, this.collisionListe[this.stage][this.compteur],  this.decorObject[this.collisionListe[this.stage][this.compteur].argument.indice] );
       }
-      if( this.collisionListe[this.stage][i].argument.exit && this.collisionListe[this.stage][i].argument.indice ){
+      if( this.collisionListe[this.stage][this.compteur].argument.exit && this.collisionListe[this.stage][this.compteur].argument.indice ){
         //ajoute les éléments de sortie.
-        typeObjet(this.collisionListe[this.stage][i],  this.decorObject[this.collisionListe[this.stage][i].argument.indice], 6);
+        typeObjet(this.compteur, this.collisionListe[this.stage][this.compteur],  this.decorObject[this.collisionListe[this.stage][this.compteur].argument.indice], ((this.collisionListe[this.stage][this.compteur].argument.opacity) || 1), 0, ((this.collisionListe[this.stage][this.compteur].argument.zindex) || 6));
       }
-      if( this.collisionListe[this.stage][i].argument.door ){
+      if( this.collisionListe[this.stage][this.compteur].argument.door ){
         //ajoute les portes.
-        typeObjet(this.collisionListe[this.stage][i],  this.decorObject[this.collisionListe[this.stage][i].argument.indice], -1);
+        typeObjet(this.compteur, this.collisionListe[this.stage][this.compteur],  this.decorObject[this.collisionListe[this.stage][this.compteur].argument.indice] );
       }
-      if( this.collisionListe[this.stage][i].argument.tree ){
+      if( this.collisionListe[this.stage][this.compteur].argument.tree ){
         //ajoute les arbres.
-        typeObjet(this.collisionListe[this.stage][i],  this.decorObject[this.collisionListe[this.stage][i].argument.indice], 6, this.collisionListe[this.stage][i].argument.url);
+        typeObjet(this.compteur, this.collisionListe[this.stage][this.compteur],  this.decorObject[this.collisionListe[this.stage][this.compteur].argument.indice], 1, this.collisionListe[this.stage][this.compteur].argument.url, 6 );
       }
-      if( this.collisionListe[this.stage][i].argument.bomb ){
+      if( this.collisionListe[this.stage][this.compteur].argument.bomb ){
         //ajoute les zones destructible.
-        typeObjet(this.collisionListe[this.stage][i],  this.decorObject[this.collisionListe[this.stage][i].argument.indice], -1);
+        typeObjet(this.compteur, this.collisionListe[this.stage][this.compteur],  this.decorObject[this.collisionListe[this.stage][this.compteur].argument.indice], 0, 0, 2 );
       }
-      // if( this.collisionListe[this.stage][i].argument.glove ){
-      //   //ajoute les passage secret.
-      //   typeObjet(this.collisionListe[this.stage][i],  this.decorObject[this.collisionListe[this.stage][i].argument.indice], -1);
-      // }
+      if( this.collisionListe[this.stage][this.compteur].argument.hide && (!this.collisionListe[this.stage][this.compteur].argument.sword || linkEtat.item.sword )){
+        //ajoute les item caché.
+        typeObjet(this.compteur, this.collisionListe[this.stage][this.compteur],  linkAction.spriteLink[4][this.collisionListe[this.stage][this.compteur].argument.indice] );
+      }
       this.compteur++;
     }
     this.compteur = 1000;
@@ -83,17 +142,17 @@ var myBackground = {
       //vérifi si ce sont des fleures
       if ( this.objetAnime[this.stage][j].argument.animation == 9 || this.objetAnime[this.stage][j].argument.animation == 10 || this.objetAnime[this.stage][j].argument.animation == 11 ){
         //ajoute des fleures
-        typeObjet(this.objetAnime[this.stage][j],  this.decorObject[this.objetAnime[this.stage][j].argument.animation], 1);
+        typeObjet(j + 1000, this.objetAnime[this.stage][j],  this.decorObject[this.objetAnime[this.stage][j].argument.animation], 1);
       }
       //vérifi si ce sont des grandes flammes
       if ( this.objetAnime[this.stage][j].argument.animation == 14 || this.objetAnime[this.stage][j].argument.animation == 15 || this.objetAnime[this.stage][j].argument.animation == 16 ){
         //ajoute des grandes flammes
-        typeObjet(this.objetAnime[this.stage][j],  this.decorObject[this.objetAnime[this.stage][j].argument.animation], 3);
+        typeObjet(j + 1000, this.objetAnime[this.stage][j],  this.decorObject[this.objetAnime[this.stage][j].argument.animation], 1, 3);
       }
       //vérifi si ce sont des petites flammes
       if ( this.objetAnime[this.stage][j].argument.animation == 17 || this.objetAnime[this.stage][j].argument.animation == 18 || this.objetAnime[this.stage][j].argument.animation == 19 ){
         //ajoute des petites flammes
-        typeObjet(this.objetAnime[this.stage][j],  this.decorObject[this.objetAnime[this.stage][j].argument.animation], 1);
+        typeObjet(j + 1000, this.objetAnime[this.stage][j],  this.decorObject[this.objetAnime[this.stage][j].argument.animation], 1);
       }
       this.compteur++;
     }
@@ -103,7 +162,7 @@ var myBackground = {
       //parcour la liste des ennemi
       for ( var k=0;this.enemiesStage[this.stage][k];k++ ){
         //ajoute les ennemis
-        typeObjet(this.enemiesStage[this.stage][k],  this.enemiesListe[this.enemiesStage[this.stage][k].argument.type], 1);
+        typeObjet(k + 1100, this.enemiesStage[this.stage][k],  this.enemiesListe[this.enemiesStage[this.stage][k].argument.type], 1);
         this.enemiesCollision[k] = false;
         this.compteur++;
       }
@@ -132,8 +191,8 @@ var myBackground = {
       this.item.top = ( parseFloat(linkAction.divPersonnage.top) - parseFloat(this.item.height) )  + 'px';
       this.shadow.left = linkAction.divPersonnage.left;
       this.shadow.top = linkAction.divPersonnage.top;
-      this.item['z-index'] = 4;
-      this.shadow['z-index'] = 1;
+      this.item.opacity = 1;
+      this.shadow.opacity = 1;
     }
     //scintillement de l'épée
     if ( linkEtat.slachSword == 3 ) {
@@ -152,7 +211,7 @@ var myBackground = {
           this.position( 6, -10, 4 );
           break;
       }
-      this.item['z-index'] = 3;
+      this.item.opacity = 1;
     }
   },
   //affiche un objet
@@ -172,8 +231,7 @@ var myBackground = {
     div.width = item.tailleX + 'px';
     //hauteur de la div
     div.height = item.tailleY + 'px';
-    div['z-index'] = 3;
-    this.spriteObjet['z-index'] = 3;
+    div.opacity = 1;
   },
   start : null,
   lift : function(timestemps){
@@ -183,8 +241,8 @@ var myBackground = {
     if ( progress > 20 ){
       this.start = timestemps;
       if ( linkEtat.spritePosition.action == 2 ){
-        this.shadow['z-index'] = 1;
-        this.item['z-index'] = 2;
+        this.shadow.opacity = 1;
+        this.item.opacity = 1;
         //vérifi si la div objet est centré en left
         if ( Math.round(parseFloat(this.item.left)) != Math.round( (parseFloat(linkAction.divPersonnage.left) + ( (parseFloat(linkAction.divPersonnage.width) - parseFloat(this.item.width)) / 2 ) ) - 1 ) ){
           //centre la div en left
@@ -247,10 +305,15 @@ var myBackground = {
         //supprime les élément destructibles.
         this.divJeux.removeChild(this.div[i]);
       }
-      // if( this.collisionListe[this.stage][i].argument.glove ){
-      //   //supprime les passage secret.
-      //   this.divJeux.removeChild(this.div[i]);
-      // }
+      if( this.collisionListe[this.stage][i].argument.hide  && (!this.collisionListe[this.stage][i].argument.sword || linkEtat.item.sword )){
+        //supprime les élément caché.
+        this.divJeux.removeChild(this.div[i]);
+      }
+      if( this.collisionListe[this.stage][i].argument.push  && (!this.collisionListe[this.stage][i].argument.sword || linkEtat.item.sword )){
+        //supprime les élément caché.
+        this.divJeux.removeChild(this.div[i]);
+        this.collisionListe[this.stage][i].argument.positionY = this.collisionListe[this.stage][i].argument.sauvY;
+      }
     }
     //parcour les élément animé
     for ( var j=0;this.objetAnime[this.stage][j];j++ ) {
@@ -271,10 +334,10 @@ var myBackground = {
       }
     }
     //positionne link en top et left
-    if ( !(this.collisionListe[this.stage][linkEtat.collision.position].argument.positionX === true) ){
+    if ( linkEtat.collision.position && !(this.collisionListe[this.stage][linkEtat.collision.position].argument.positionX === true) ){
       linkAction.divPersonnage.left = this.collisionListe[this.stage][linkEtat.collision.position].argument.positionX + 'px';
     }
-    if ( !(this.collisionListe[this.stage][linkEtat.collision.position].argument.positionY === true) ){
+    if ( linkEtat.collision.position && !(this.collisionListe[this.stage][linkEtat.collision.position].argument.positionY === true) ){
       linkAction.divPersonnage.top = this.collisionListe[this.stage][linkEtat.collision.position].argument.positionY + 'px';
     }
     this.stage = stage;
@@ -285,6 +348,7 @@ var myBackground = {
     }
     linkEtat.collision.position = null;
     linkEtat.collision.direction = null;
+    linkEtat.collision.collisionBooleen = 0;
   },
   start : null,
   //animation du stage
@@ -297,7 +361,7 @@ var myBackground = {
       //parcour les élément animé
       for ( var i=0;this.objetAnime[this.stage][i];i++ ){
         //fleur
-        if ( this.objetAnime[this.stage][i].argument.animation == 9 || this.objetAnime[this.stage][i].argument.animation == 10 || this.objetAnime[this.stage][i].argument.animation == 11 ){
+        if ( this.image[i + 1000] && this.objetAnime[this.stage][i].argument.animation == 9 || this.objetAnime[this.stage][i].argument.animation == 10 || this.objetAnime[this.stage][i].argument.animation == 11 ){
           this.image[i + 1000].style.top = this.decorObject[this.objetAnime[this.stage][i].argument.animation].positionY + 'px';//position de l'image en y
           this.image[i + 1000].style.left = this.decorObject[this.objetAnime[this.stage][i].argument.animation].positionX + 'px';//position de l'image en x
           //réinitialise l'animation
@@ -305,7 +369,7 @@ var myBackground = {
           if (this.objetAnime[this.stage][i].argument.animation > 11) this.objetAnime[this.stage][i].argument.animation = 9;
         }
         //grand flambo
-        if ( this.objetAnime[this.stage][i].argument.animation == 14 || this.objetAnime[this.stage][i].argument.animation == 15 || this.objetAnime[this.stage][i].argument.animation == 16 ){
+        if ( this.image[i + 1000] && this.objetAnime[this.stage][i].argument.animation == 14 || this.objetAnime[this.stage][i].argument.animation == 15 || this.objetAnime[this.stage][i].argument.animation == 16 ){
           this.image[i + 1000].style.top = this.decorObject[this.objetAnime[this.stage][i].argument.animation].positionY + 'px';//position de l'image en y
           this.image[i + 1000].style.left = this.decorObject[this.objetAnime[this.stage][i].argument.animation].positionX + 'px';//position de l'image en x
           //réinitialise l'animation
@@ -313,7 +377,7 @@ var myBackground = {
           if (this.objetAnime[this.stage][i].argument.animation > 16) this.objetAnime[this.stage][i].argument.animation = 14;
         }
         //petit flambo
-        if ( this.objetAnime[this.stage][i].argument.animation == 17 || this.objetAnime[this.stage][i].argument.animation == 18 || this.objetAnime[this.stage][i].argument.animation == 19 || this.objetAnime[this.stage][i].argument.animation == 20 ){
+        if ( this.image[i + 1000] && this.objetAnime[this.stage][i].argument.animation == 17 || this.objetAnime[this.stage][i].argument.animation == 18 || this.objetAnime[this.stage][i].argument.animation == 19 || this.objetAnime[this.stage][i].argument.animation == 20 ){
           this.image[i + 1000].style.top = this.decorObject[this.objetAnime[this.stage][i].argument.animation].positionY + 'px';//position de l'image en y
           this.image[i + 1000].style.left = this.decorObject[this.objetAnime[this.stage][i].argument.animation].positionX + 'px';//position de l'image en x
           //réinitialise l'animation
@@ -324,63 +388,65 @@ var myBackground = {
       if ( linkEtat.item.sword ){
         //parcour la liste des ennemis
         for ( var j=0;this.enemiesStage[this.stage][j];j++ ){
-          var sprite;
-          mouvement = 1;
-          //vérifie si l'ennemi a encore de la vie
-          if ( this.enemiesStage[this.stage][j].argument.life <= 0 ) {
-            //supression de l'ennemi tué
-            this.collisionListe[this.stage][j].modif(false);
-            this.div[j + 1100].style['z-index'] = -1;
-            this.div[j + 1100].style.top = '-1000px';
-          }
-          //vérifi que l'ennemi est vivant
-          if ( this.enemiesStage[this.stage][j].existance() && this.enemiesStage[this.stage][j].argument.life > 0 ){
-            //vérifi si l'ennemi a été touché pour le faire clignoter
-            if ( ( !this.enemiesStage[this.stage][j].argument.hit ) && ( ( Date.now() - this.enemiesStage[this.stage][j].argument.lastFire ) < 500 ) ) {
-              if ( this.div[j + 1100].style['z-index'] == 1 ) {
-                this.div[j + 1100].style['z-index'] = -1;
-              } else {
-                this.div[j + 1100].style['z-index'] = 1;
-              }
-            } else {
-              this.enemiesStage[this.stage][j].argument.hit = 1;
-              this.div[j + 1100].style['z-index'] = 1;
+          //vérifi si l'image à fini de chager
+          if (this.image[j + 1100]) {
+            var sprite;
+            mouvement = 1;
+            //vérifie si l'ennemi a encore de la vie
+            if ( this.enemiesStage[this.stage][j].argument.life <= 0 ) {
+              //supression de l'ennemi tué
+              this.collisionListe[this.stage][j].modif(false);
+              this.div[j + 1100].style.opacity = 0;
+              this.div[j + 1100].style.top = '-1000px';
             }
-            //type d'ennemis 0, 2 et 3
-            if ( this.enemiesStage[this.stage][j].argument.type == 0 || this.enemiesStage[this.stage][j].argument.type == 2 || this.enemiesStage[this.stage][j].argument.type == 3 ){
-              this.enemiesStage[this.stage][j].argument.animation++;
-              //réinitialise la postion du sprite
-              if ( !this.enemiesListe[this.enemiesStage[this.stage][j].argument.type][this.enemiesStage[this.stage][j].argument.animation] ) this.enemiesStage[this.stage][j].argument.animation = 0;
-              sprite = this.enemiesListe[this.enemiesStage[this.stage][j].argument.type][this.enemiesStage[this.stage][j].argument.animation];
-              this.enemiesStage[this.stage][j].argument.visibly = this.enemiesStage[this.stage][j].argument.way.direction;
-            }
-            //type d'ennemis 4
-            if ( this.enemiesStage[this.stage][j].argument.type == 4 ){
-              if ( this.enemiesStage[this.stage][j].argument.aggro ||  Date.now() - this.enemiesStage[this.stage][j].argument.delay < 1000 ){
-                if( !this.enemiesStage[this.stage][j].argument.animation.position ){
-                  this.enemiesStage[this.stage][j].argument.animation.position++;
+            //vérifi que l'ennemi est vivant
+            if ( this.enemiesStage[this.stage][j].existance() && this.enemiesStage[this.stage][j].argument.life > 0 ){
+              //vérifi si l'ennemi a été touché pour le faire clignoter
+              if ( ( !this.enemiesStage[this.stage][j].argument.hit ) && ( ( Date.now() - this.enemiesStage[this.stage][j].argument.lastFire ) < 500 ) ) {
+                if ( this.div[j + 1100].style.opacity == 1 ) {
+                  this.div[j + 1100].style.opacity = 0.4;
                 } else {
-                  this.enemiesStage[this.stage][j].argument.animation.position = 0;
+                  this.div[j + 1100].style.opacity = 1;
                 }
-                this.enemiesStage[this.stage][j].argument.way.visibly = this.enemiesStage[this.stage][j].argument.way.direction;
               } else {
-                if ( Date.now() - this.enemiesStage[this.stage][j].argument.delay < 1500) {
-                  this.enemiesStage[this.stage][j].argument.animation.position = 2;
-                  //bloque le mouvement
-                  mouvement = 0;
+                this.enemiesStage[this.stage][j].argument.hit = 1;
+                this.div[j + 1100].style.opacity = 1;
+              }
+              //type d'ennemis 0, 2 et 3
+              if ( this.enemiesStage[this.stage][j].argument.type == 0 || this.enemiesStage[this.stage][j].argument.type == 2 || this.enemiesStage[this.stage][j].argument.type == 3 ){
+                this.enemiesStage[this.stage][j].argument.animation++;
+                //réinitialise la postion du sprite
+                if ( !this.enemiesListe[this.enemiesStage[this.stage][j].argument.type][this.enemiesStage[this.stage][j].argument.animation] ) this.enemiesStage[this.stage][j].argument.animation = 0;
+                sprite = this.enemiesListe[this.enemiesStage[this.stage][j].argument.type][this.enemiesStage[this.stage][j].argument.animation];
+                this.enemiesStage[this.stage][j].argument.visibly = this.enemiesStage[this.stage][j].argument.way.direction;
+              }
+              //type d'ennemis 4
+              if ( this.enemiesStage[this.stage][j].argument.type == 4 ){
+                if ( this.enemiesStage[this.stage][j].argument.aggro ||  Date.now() - this.enemiesStage[this.stage][j].argument.delay < 1000 ){
+                  if( !this.enemiesStage[this.stage][j].argument.animation.position ){
+                    this.enemiesStage[this.stage][j].argument.animation.position++;
+                  } else {
+                    this.enemiesStage[this.stage][j].argument.animation.position = 0;
+                  }
+                  this.enemiesStage[this.stage][j].argument.way.visibly = this.enemiesStage[this.stage][j].argument.way.direction;
                 } else {
-                  if ( Date.now() - this.enemiesStage[this.stage][j].argument.delay < 2000) {
+                  if ( Date.now() - this.enemiesStage[this.stage][j].argument.delay < 1500) {
+                    this.enemiesStage[this.stage][j].argument.animation.position = 2;
                     //bloque le mouvement
                     mouvement = 0;
-                    this.enemiesStage[this.stage][j].argument.animation.position = 3;
                   } else {
-                    this.enemiesStage[this.stage][j].argument.delay = Date.now();
+                    if ( Date.now() - this.enemiesStage[this.stage][j].argument.delay < 2000) {
+                      //bloque le mouvement
+                      mouvement = 0;
+                      this.enemiesStage[this.stage][j].argument.animation.position = 3;
+                    } else {
+                      this.enemiesStage[this.stage][j].argument.delay = Date.now();
+                    }
                   }
                 }
-              }
-              //vérifi la direction pour positionné le sprite correspondant
-              switch ( this.enemiesStage[this.stage][j].argument.way.direction ) {
-                case 'N':
+                //vérifi la direction pour positionné le sprite correspondant
+                switch ( this.enemiesStage[this.stage][j].argument.way.direction ) {
+                  case 'N':
                   this.enemiesStage[this.stage][j].argument.animation.sens = 3;
                   if(this.enemiesStage[this.stage][j].argument.animation.position == 2){
                     this.enemiesStage[this.stage][j].argument.visibly = 'W';
@@ -390,7 +456,7 @@ var myBackground = {
                     }
                   }
                   break;
-                case 'S':
+                  case 'S':
                   this.enemiesStage[this.stage][j].argument.animation.sens = 0;
                   if(this.enemiesStage[this.stage][j].argument.animation.position == 2){
                     this.enemiesStage[this.stage][j].argument.visibly = 'E';
@@ -400,7 +466,7 @@ var myBackground = {
                     }
                   }
                   break;
-                case 'W':
+                  case 'W':
                   this.enemiesStage[this.stage][j].argument.animation.sens = 2;
                   if(this.enemiesStage[this.stage][j].argument.animation.position == 2){
                     this.enemiesStage[this.stage][j].argument.visibly = 'S';
@@ -410,7 +476,7 @@ var myBackground = {
                     }
                   }
                   break;
-                case 'E':
+                  case 'E':
                   this.enemiesStage[this.stage][j].argument.animation.sens = 1;
                   if(this.enemiesStage[this.stage][j].argument.animation.position == 2){
                     this.enemiesStage[this.stage][j].argument.visibly = 'N';
@@ -420,57 +486,58 @@ var myBackground = {
                     }
                   }
                   break;
+                }
+                sprite = this.enemiesListe[this.enemiesStage[this.stage][j].argument.type][this.enemiesStage[this.stage][j].argument.animation.sens][this.enemiesStage[this.stage][j].argument.animation.position];
               }
-              sprite = this.enemiesListe[this.enemiesStage[this.stage][j].argument.type][this.enemiesStage[this.stage][j].argument.animation.sens][this.enemiesStage[this.stage][j].argument.animation.position];
-            }
-            //positionne le sprite
-            this.positionSprite(this.div[j + 1100].style, this.image[j + 1100].style, sprite);
-            //test la zone d'aggro
-            if (!this.enemiesStage[this.stage][j].argument.aggro || Date.now() - this.enemiesStage[this.stage][j].argument.lastAggro > 2000 ) { this.aggro(this.enemiesStage[this.stage][j], j); }
-            //vérifi si link est à moins de 20px ou si il a été vue
-            if ( ( Math.abs(parseFloat(this.div[j + 1100].style.top) - parseFloat(linkAction.divPersonnage.top)) < 20 && !this.enemiesCollision[j] && Math.abs(parseFloat(this.div[j + 1100].style.left) - parseFloat(linkAction.divPersonnage.left)) < 20 ) || this.enemiesStage[this.stage][j].argument.aggro ){
-              var sens = 1;
-              var direction = 'S';
-              if ( parseFloat(this.div[j + 1100].style.top) - parseFloat(linkAction.divPersonnage.top) > 0 ) {
-                sens = 0;
-                direction = 'N';
-              }
-              this.enemiesStage[this.stage][j].argument.way.direction = direction;
-              //test si une collision a lieu avec un obstacle ou avec link dans le sens top
-              linkAction.moving('top', sens, this.div[j + 1100].style, this.collisionListe[this.stage], direction, this.enemiesStage[this.stage][j], 0, linkEtat.sauvPositionSprite, this.enemiesStage[this.stage][j].argument.collisionLink);
-              linkAction.moving('top', sens, this.div[j + 1100].style, this.collisionListe[this.stage], direction, this.enemiesStage[this.stage][j], 0, linkEtat.sauvPositionSprite, this.enemiesStage[this.stage][j].argument.collisionLink);
-              if ( this.enemiesStage[this.stage][j].argument.collisionLink.collisionBooleen  && ( ( Date.now() - this.enemiesStage[this.stage][j].argument.lastFire ) > 500 ) ){
-                this.hit(j);
-              }
-              if ( parseFloat(this.div[j + 1100].style.left) - parseFloat(linkAction.divPersonnage.left) > 0 ) {
-                sens = 0;
-                direction = 'W';
-              } else {
-                sens = 1;
-                direction = 'E';
-              }
-              if ( ( Math.abs(parseFloat(this.div[j + 1100].style.top) - parseFloat(linkAction.divPersonnage.top)) < Math.abs(parseFloat(this.div[j + 1100].style.left) - parseFloat(linkAction.divPersonnage.left)) ) ){
+              //positionne le sprite
+              this.positionSprite(this.div[j + 1100].style, this.image[j + 1100].style, sprite);
+              //test la zone d'aggro
+              if (!this.enemiesStage[this.stage][j].argument.aggro || Date.now() - this.enemiesStage[this.stage][j].argument.lastAggro > 2000 ) { this.aggro(this.enemiesStage[this.stage][j], j); }
+              //vérifi si link est à moins de 20px ou si il a été vue
+              if ( ( Math.abs(parseFloat(this.div[j + 1100].style.top) - parseFloat(linkAction.divPersonnage.top)) < 40 && !this.enemiesCollision[j] && Math.abs(parseFloat(this.div[j + 1100].style.left) - parseFloat(linkAction.divPersonnage.left)) < 40 ) || this.enemiesStage[this.stage][j].argument.aggro ){
+                var sens = 1;
+                var direction = 'S';
+                if ( parseFloat(this.div[j + 1100].style.top) - parseFloat(linkAction.divPersonnage.top) > 0 ) {
+                  sens = 0;
+                  direction = 'N';
+                }
                 this.enemiesStage[this.stage][j].argument.way.direction = direction;
+                //test si une collision a lieu avec un obstacle ou avec link dans le sens top
+                linkAction.moving('top', sens, this.div[j + 1100].style, this.collisionListe[this.stage], direction, this.enemiesStage[this.stage][j], 0, linkEtat.sauvPositionSprite, this.enemiesStage[this.stage][j].argument.collisionLink);
+                linkAction.moving('top', sens, this.div[j + 1100].style, this.collisionListe[this.stage], direction, this.enemiesStage[this.stage][j], 0, linkEtat.sauvPositionSprite, this.enemiesStage[this.stage][j].argument.collisionLink);
+                if ( this.enemiesStage[this.stage][j].argument.collisionLink.collisionBooleen  && ( ( Date.now() - this.enemiesStage[this.stage][j].argument.lastFire ) > 500 ) ){
+                  this.hit(j);
+                }
+                if ( parseFloat(this.div[j + 1100].style.left) - parseFloat(linkAction.divPersonnage.left) > 0 ) {
+                  sens = 0;
+                  direction = 'W';
+                } else {
+                  sens = 1;
+                  direction = 'E';
+                }
+                if ( ( Math.abs(parseFloat(this.div[j + 1100].style.top) - parseFloat(linkAction.divPersonnage.top)) < Math.abs(parseFloat(this.div[j + 1100].style.left) - parseFloat(linkAction.divPersonnage.left)) ) ){
+                  this.enemiesStage[this.stage][j].argument.way.direction = direction;
+                }
+                //test si une collision a lieu avec un obstacle ou avec link dans le sens left
+                linkAction.moving('left', sens, this.div[j + 1100].style, this.collisionListe[this.stage], direction, this.enemiesStage[this.stage][j], 0, linkEtat.sauvPositionSprite, this.enemiesStage[this.stage][j].argument.collisionLink);
+                linkAction.moving('left', sens, this.div[j + 1100].style, this.collisionListe[this.stage], direction, this.enemiesStage[this.stage][j], 0, linkEtat.sauvPositionSprite, this.enemiesStage[this.stage][j].argument.collisionLink);
+                if ( this.enemiesStage[this.stage][j].argument.collisionLink.collisionBooleen && ( ( Date.now() - this.enemiesStage[this.stage][j].argument.lastFire ) > 500 ) ){
+                  this.hit(j);
+                }
+              } else {
+                if ( mouvement ){
+                  this.moving(this.enemiesStage[this.stage][j], j);
+                }
               }
-              //test si une collision a lieu avec un obstacle ou avec link dans le sens left
-              linkAction.moving('left', sens, this.div[j + 1100].style, this.collisionListe[this.stage], direction, this.enemiesStage[this.stage][j], 0, linkEtat.sauvPositionSprite, this.enemiesStage[this.stage][j].argument.collisionLink);
-              linkAction.moving('left', sens, this.div[j + 1100].style, this.collisionListe[this.stage], direction, this.enemiesStage[this.stage][j], 0, linkEtat.sauvPositionSprite, this.enemiesStage[this.stage][j].argument.collisionLink);
-              if ( this.enemiesStage[this.stage][j].argument.collisionLink.collisionBooleen && ( ( Date.now() - this.enemiesStage[this.stage][j].argument.lastFire ) > 500 ) ){
-                this.hit(j);
-              }
+              //sauvegarde la position des ennemis
+              this.enemiesStage[this.stage][j].tailleX = parseFloat(this.div[j + 1100].style.width);
+              this.enemiesStage[this.stage][j].tailleY = parseFloat(this.div[j + 1100].style.width);
+              this.enemiesStage[this.stage][j].positionX = parseFloat(this.div[j + 1100].style.left);
+              this.enemiesStage[this.stage][j].positionY = parseFloat(this.div[j + 1100].style.top);
             } else {
-              if ( mouvement ){
-                this.moving(this.enemiesStage[this.stage][j], j);
-              }
+              this.enemiesStage[this.stage][j].positionY = parseFloat(this.div[j + 1100].style.top);
+              this.div[j + 1100].style.opacity = 0;
             }
-            //sauvegarde la position des ennemis
-            this.enemiesStage[this.stage][j].tailleX = parseFloat(this.div[j + 1100].style.width);
-            this.enemiesStage[this.stage][j].tailleY = parseFloat(this.div[j + 1100].style.width);
-            this.enemiesStage[this.stage][j].positionX = parseFloat(this.div[j + 1100].style.left);
-            this.enemiesStage[this.stage][j].positionY = parseFloat(this.div[j + 1100].style.top);
-          } else {
-            this.enemiesStage[this.stage][j].positionY = parseFloat(this.div[j + 1100].style.top);
-            this.div[j + 1100].style['z-index'] = -1;
           }
         }
       }
@@ -590,7 +657,7 @@ var myBackground = {
       if ( linkEtat.slachSword != 0 ) sensPlusCoup = 1;
     }
     //vérifie si link a été touché ou l'ennemi
-    if ( ( ( Date.now() - linkEtat.collisionEnemi.lastFire ) > 1000 ) && linkEtat.slachSword != 4 && sensPlusCoup ){
+    if ( ( ( Date.now() - linkEtat.collisionEnemi.lastFire ) > 2000 ) && linkEtat.slachSword != 4 && sensPlusCoup && linkEtat.life[0] > 0 ){
       linkAction.touche(this.enemiesStage[this.stage][indice].argument.damage);
       linkEtat.collisionEnemi.lastFire = Date.now();
     } else {
@@ -655,10 +722,19 @@ var myBackground = {
   },
   // liste des collisition
   collisionListe : [[//indice 0 chambre de link
-    cP(178, 114, 15, 15, {chest : true, item : 9, chestContent : function(){linkEtat.item.shield = true; linkAction.walk = 1;}}), /* coffre */
-    cP(25, 57, 15, 13, {lift : true, indice : 3, destructible : true}), /* Liste des pot - pot bas */
-    cP(25, 41, 15, 13, {lift : true, indice : 3, destructible : true}), /* pot milieu */
-    cP(25, 25, 15, 13, {lift : true, indice : 3, destructible : true}), /* pot haut */
+    cP(178, 114, 15, 15, {chest : true, item : 9,
+      chestContent : function(){
+        myBackground.listeOfSkill[0].opacity = 1;
+        linkEtat.item.shield = true;
+        linkAction.walk = 1;
+        linkAction.messageLoading = myBackground.arrayMessage[2];
+        linkAction.textProgress = 1;
+        linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)});
+      }}), /* coffre */
+    cP(27, 58, 12, 12, {lift : true, indice : 3, destructible : true}), /* Liste des pot - pot bas */
+    cP(27, 42, 12, 12, {lift : true, indice : 3, destructible : true}), /* pot milieu */
+    cP(27, 26, 12, 12, {lift : true, indice : 3, destructible : true}), /* pot haut */
+    // cP(97, 178, 20, 0, {axies : 'top', exit : true, stage : 11, positionX : 169, positionY : 432, indice : 5, positionExit : -8}), /* sortie */
     cP(97, 178, 20, 0, {axies : 'top', exit : true, stage : 1, positionX : 184, positionY : 272, indice : 5, positionExit : -8}), /* sortie */
     cP(1, 152, 103, 26),/* bord bas gauche */
     cP(122, 152, 104, 26),/* bord bas droit */
@@ -680,11 +756,31 @@ var myBackground = {
     cP(201, 272, 7, 4), //bas de porte droite
     cP(176, 271, 32, 0, {axies : 'top', door : true, stage : 0, indice : 7, positionExit : -26}),//ouverture de la porte
     cP(176, 265, 32, 0, {axies : 'top', exit : true, stage : 0, positionX : 105, positionY : 153, indice : 6, positionExit : -20}),//retour dans la maison de link
+    cP(144, 288, 16, 16,{sword : 1, indice : 17, item : 17, hide : 1, chestContent : function(){
+      myBackground.listeOfSkill[8].opacity = 1;
+      linkEtat.key.express = 1;
+      linkAction.messageLoading = myBackground.arrayMessage[9];
+      linkAction.textProgress = 1;
+      linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)});
+    }, condition : function () {
+      return (linkEtat.item.sword == 1 && !myBackground.collisionListe[1][25].existance());
+    }}),
     //liste buisson
     cP(160, 64, 16, 16, {lift : true, indice : 0, destructible : true}),
     cP(176, 48, 16, 16, {lift : true, indice : 0, destructible : true}),
     cP(272, 48, 16, 16, {lift : true, indice : 0, destructible : true}),
-    cP(304, 64, 16, 16, {lift : true, indice : 0, item : 10, destructible : true}),
+    cP(304, 64, 16, 16, {lift : true, indice : 0, destructible : true}),
+    cP(304, 64, 16, 16, {indice : 10, item : 10, hide : 1,
+      chestContent : function(){
+        myBackground.listeOfSkill[1].opacity = 1;
+        linkEtat.item.blueChainMail = 1;
+        linkEtat.spritePosition.color = 2;
+        linkAction.messageLoading = myBackground.arrayMessage[3];
+        linkAction.textProgress = 1;
+        linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)});
+      }, condition : function () {
+        return !(myBackground.collisionListe[1][12].existance());
+      }}),
     cP(32, 272, 16, 16, {lift : true, indice : 0, destructible : true}),
     cP(32, 288, 16, 16, {lift : true, indice : 0, destructible : true}),
     cP(32, 304, 16, 16, {lift : true, indice : 0, destructible : true}),
@@ -707,11 +803,23 @@ var myBackground = {
     cP(432, 352, 16, 16, {lift : true, indice : 0, destructible : true}),
     cP(448, 368, 16, 16, {lift : true, indice : 0, destructible : true}),
     //liste des pierre
-    cP(128, 321, 16, 15, {lift : true, indice : 1}),
-    cP(144, 321, 16, 15, {lift : true, indice : 1}),
-    cP(208, 321, 16, 15, {lift : true, indice : 1}),
-    cP(224, 321, 16, 15, {lift : true, indice : 1}),
-    cP(240, 321, 16, 15, {lift : true, indice : 1}),
+    cP(128, 321, 16, 15, {lift : true, indice : 1, glove : 1}),
+    cP(144, 321, 16, 15, {lift : true, indice : 1, glove : 1}),
+    cP(208, 321, 16, 15, {lift : true, indice : 1, glove : 1}),
+    cP(208, 321, 16, 15, {item : 16, indice : 16, hide: 1,
+      chestContent : function(){
+        myBackground.listeOfSkill[7].opacity = 1;
+        linkEtat.key.mongoDB = 1;
+        linkAction.messageLoading = myBackground.arrayMessage[7];
+        linkAction.textProgress = 1;
+        linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)});
+      },
+      condition : function () {
+        return !(myBackground.collisionListe[1][37].existance());
+      }
+      }),//clé 1 mongoDB
+    cP(224, 321, 16, 15, {lift : true, indice : 1, glove : 1}),
+    cP(240, 321, 16, 15, {lift : true, indice : 1, glove : 1}),
     //bord gauche
     cP(448, 0, 0, 29),
     cP(447, 30, 1, 1),
@@ -930,45 +1038,45 @@ var myBackground = {
     cP(158, 4, 1, 3),
     cP(159, 0, 1, 4),
     //sommet de la falaise bas gauche
-    cP(0, 342, 52, 0, {decallageX : 0, decallageY : 42}),
-    cP(52, 339, 4, 3, {decallageX : 11, decallageY : 37}),
-    cP(56, 334, 4, 5, {decallageX : 8, decallageY : 29}),
-    cP(60, 331, 4, 3, {decallageX : 3, decallageY : 31}),
-    cP(64, 326, 4, 3, {decallageX : 5, decallageY : 0}),
+    cP(0, 342, 52, 0, {decallageX : 0, decallageY : 42, cliff : true}),
+    cP(52, 339, 4, 3, {decallageX : 11, decallageY : 37, cliff : true}),
+    cP(56, 334, 4, 5, {decallageX : 8, decallageY : 29, cliff : true}),
+    cP(60, 331, 4, 3, {decallageX : 3, decallageY : 31, cliff : true}),
+    cP(64, 326, 4, 3, {decallageX : 5, decallageY : 0, cliff : true}),
     //sommet de la falaise gauche
-    cP(0, 249, 61, 0, {decallageX : 18, decallageY : 0}),
-    cP(105, 158, 0, 23, {decallageX : 26, decallageY : 0}),
-    cP(106, 154, 2, 5, {decallageX : 26, decallageY : 27}),
-    cP(108, 150, 4, 3, {decallageX : 24, decallageY : 24}),
-    cP(112, 146, 4, 4, {decallageX : 26, decallageY : 27}),
-    cP(116, 142, 4, 3, {decallageX : 24, decallageY : 24}),
-    cP(120, 137, 4, 5, {decallageX : 26, decallageY : 21}),
+    cP(0, 249, 61, 0, {decallageX : 18, decallageY : 0, cliff : true}),
+    cP(105, 158, 0, 23, {decallageX : 26, decallageY : 0, cliff : true}),
+    cP(106, 154, 2, 5, {decallageX : 26, decallageY : 27, cliff : true}),
+    cP(108, 150, 4, 3, {decallageX : 24, decallageY : 24, cliff : true}),
+    cP(112, 146, 4, 4, {decallageX : 26, decallageY : 27, cliff : true}),
+    cP(116, 142, 4, 3, {decallageX : 24, decallageY : 24, cliff : true}),
+    cP(120, 137, 4, 5, {decallageX : 26, decallageY : 21, cliff : true}),
     //sommet de la falaise haut
-    cP(124, 137, 120, 0, {decallageX : 0, decallageY : 18}),
+    cP(124, 137, 120, 0, {decallageX : 0, decallageY : -18, cliff : true}),
     //sommet de la falaise droite
-    cP(244, 138, 4, 4, {decallageX : 26, decallageY : 21}),
-    cP(248, 142, 4, 3, {decallageX : 24, decallageY : 24}),
-    cP(252, 145, 4, 5, {decallageX : 26, decallageY : 27}),
-    cP(256, 150, 4, 3, {decallageX : 24, decallageY : 24}),
-    cP(260, 153, 4, 5, {decallageX : 26, decallageY : 27}),
-    cP(264, 158, 4, 3, {decallageX : 24, decallageY : 24}),
-    cP(268, 162, 4, 5, {decallageX : 26, decallageY : 27}),
-    cP(272, 166, 4, 3, {decallageX : 24, decallageY : 24}),
-    cP(276, 169, 4, 5, {decallageX : 26, decallageY : 27}),
-    cP(278, 174, 0, 165, {decallageX : 26, decallageY : 0}),
-    cP(276, 339, 2, 3, {decallageX : 28, decallageY : 42}),
+    cP(244, 138, 4, 4, {decallageX : 26, decallageY : -21, cliff : true}),
+    cP(248, 142, 4, 3, {decallageX : 24, decallageY : -24, cliff : true}),
+    cP(252, 145, 4, 5, {decallageX : 26, decallageY : -27, cliff : true}),
+    cP(256, 150, 4, 3, {decallageX : 24, decallageY : -24, cliff : true}),
+    cP(260, 153, 4, 5, {decallageX : 26, decallageY : -27, cliff : true}),
+    cP(264, 158, 4, 3, {decallageX : 24, decallageY : -24, cliff : true}),
+    cP(268, 162, 4, 5, {decallageX : 26, decallageY : -27, cliff : true}),
+    cP(272, 166, 4, 3, {decallageX : 24, decallageY : -24, cliff : true}),
+    cP(276, 169, 4, 5, {decallageX : 26, decallageY : -27, cliff : true}),
+    cP(278, 174, 0, 165, {decallageX : 0, decallageY : 26, cliff : true}),
+    cP(276, 339, 2, 3, {decallageX : -28, decallageY : 42, cliff : true}),
     //sommet de la falaise bas
-    cP(124, 342, 152, 0, {decallageX : 0, decallageY : 42}),
-    cP(120, 339, 4, 3, {decallageX : 15, decallageY : 40}),
-    cP(116, 334, 4, 5, {decallageX : 12, decallageY : 34}),
-    cP(112, 331, 4, 3, {decallageX : 8, decallageY : 34}),
+    cP(124, 342, 152, 0, {decallageX : 0, decallageY : 42, cliff : true}),
+    cP(120, 339, 4, 3, {decallageX : 15, decallageY : 40, cliff : true}),
+    cP(116, 334, 4, 5, {decallageX : 12, decallageY : 34, cliff : true}),
+    cP(112, 331, 4, 3, {decallageX : 8, decallageY : 34, cliff : true}),
     //sortie
-    cP(160, 0, 288, 0, {axies : 'top', exit : false, stage : 100, positionX : 184, positionY : 272}),//sortie nord
+    cP(160, 0, 288, 0, {axies : 'top', exit : true, stage : 3, positionX : 840, positionY : 1005}),//sortie nord
     cP(0, 182, 0, 50, {axies : 'left', exit : true, stage : 2, positionX : 496, positionY : true}),//sortie ouest haut
     cP(0, 248, 0, 96, {axies : 'left', exit : true, stage : 2, positionX : 496, positionY : true}),//sortie ouest centre
     cP(0, 384, 0, 57, {axies : 'left', exit : true, stage : 2, positionX : 496, positionY : true}),//sortie ouest bas
-    cP(511, 373, 0, 59, {axies : 'left', exit : true, stage : 3, positionX : 184, positionY : 272}),//sortie est
-    cP(208, 511, 48, 0, {axies : 'top', exit : true, stage : 4, positionX : 184, positionY : 272})//sortie sud
+    cP(511, 373, 0, 59, {notExit : 1, decallageX: -10}),//sortie est
+    cP(208, 511, 48, 0, {notExit : 1, decallageY: -10})//sortie sud
   ],[//indice stage 2 Forest
     //arbre droite haut
     cP(448, 135, 64, 49),
@@ -1184,38 +1292,38 @@ var myBackground = {
     cP(435, 328, 1, 8),
     cP(432, 326, 3, 3),
     //sommet de la falaise bas droite
-    cP(476, 342, 36, 0, {decallageX : 0, decallageY : 42}),
-    cP(472, 339, 4, 3, {decallageX : 15, decallageY : 40}),
-    cP(468, 334, 4, 5, {decallageX : 12, decallageY : 34}),
-    cP(464, 331, 4, 4, {decallageX : 12, decallageY : 34}),
+    cP(476, 342, 36, 0, {decallageX : 0, decallageY : 42, cliff : true}),
+    cP(472, 339, 4, 3, {decallageX : 15, decallageY : 40, cliff : true}),
+    cP(468, 334, 4, 5, {decallageX : 12, decallageY : 34, cliff : true}),
+    cP(464, 331, 4, 4, {decallageX : 12, decallageY : 34, cliff : true}),
     //sommet de la falaise milieu
-    cP(428, 331, 4, 4, {decallageX : 8, decallageY : 34}),
-    cP(424, 334, 5, 6, {decallageX : 12, decallageY : 34}),
-    cP(420, 339, 4, 3, {decallageX : 15, decallageY : 40}),
-    cP(396, 342, 24, 0, {decallageX : 0, decallageY : 42}),
-    cP(392, 349, 4, 3, {decallageX : 42, decallageY : 42}),
-    cP(388, 334, 4, 5, {decallageX : 40, decallageY : 41}),
-    cP(384, 331, 4, 3, {decallageX : 36, decallageY : 42}),
-    cP(380, 326, 4, 4, {decallageX : 32, decallageY : 41}),
-    cP(379, 313, 0, 13, {decallageX : 26, decallageY : 0}),
-    cP(380, 310, 4, 3, {decallageX : 24, decallageY : 24}),
-    cP(384, 306, 4, 5, {decallageX : 26, decallageY : 27}),
-    cP(388, 302, 4, 3, {decallageX : 24, decallageY : 24}),
-    cP(392, 298, 4, 4, {decallageX : 26, decallageY : 21}),
-    cP(396, 296, 18, 2, {decallageX : 40, decallageY : 24}),
-    cP(414, 294, 3, 2, {decallageX : 40, decallageY : 24}),
-    cP(417, 289, 5, 3, {decallageX : 42, decallageY : 27}),
-    cP(420, 286, 4, 3, {decallageX : 40, decallageY : 24}),
-    cP(424, 281, 4, 5, {decallageX : 42, decallageY : 27}),
-    cP(428, 278, 4, 3, {decallageX : 35, decallageY : 24}),
-    cP(432, 273, 4, 5, {decallageX : 25, decallageY : 27}),
-    cP(236, 270, 4, 3, {decallageX : 24, decallageY : 24}),
-    cP(240, 265, 4, 5, {decallageX : 26, decallageY : 27}),
-    cP(444, 262, 4, 3, {decallageX : 24, decallageY : 24}),
-    cP(448, 257, 4, 5, {decallageX : 26, decallageY : 27}),
-    cP(452, 255, 4, 3, {decallageX : 24, decallageY : 24}),
-    cP(456, 250, 4, 4, {decallageX : 26, decallageY : 21}),
-    cP(460, 249, 52, 0, {decallageX : 0, decallageY : 18}),
+    cP(428, 331, 4, 4, {decallageX : 8, decallageY : 34, cliff : true}),
+    cP(424, 334, 5, 6, {decallageX : 12, decallageY : 34, cliff : true}),
+    cP(420, 339, 4, 3, {decallageX : 15, decallageY : 40, cliff : true}),
+    cP(396, 342, 24, 0, {decallageX : 0, decallageY : 42, cliff : true}),
+    cP(392, 349, 4, 3, {decallageX : 42, decallageY : 42, cliff : true}),
+    cP(388, 334, 4, 5, {decallageX : 40, decallageY : 41, cliff : true}),
+    cP(384, 331, 4, 3, {decallageX : 36, decallageY : 42, cliff : true}),
+    cP(380, 326, 4, 4, {decallageX : 32, decallageY : 41, cliff : true}),
+    cP(379, 313, 0, 13, {decallageX : 26, decallageY : 0, cliff : true}),
+    cP(380, 310, 4, 3, {decallageX : 24, decallageY : 24, cliff : true}),
+    cP(384, 306, 4, 5, {decallageX : 26, decallageY : 27, cliff : true}),
+    cP(388, 302, 4, 3, {decallageX : 24, decallageY : 24, cliff : true}),
+    cP(392, 298, 4, 4, {decallageX : 26, decallageY : 21, cliff : true}),
+    cP(396, 296, 18, 2, {decallageX : 40, decallageY : 24, cliff : true}),
+    cP(414, 294, 3, 2, {decallageX : 40, decallageY : 24, cliff : true}),
+    cP(417, 289, 5, 3, {decallageX : 42, decallageY : 27, cliff : true}),
+    cP(420, 286, 4, 3, {decallageX : 40, decallageY : 24, cliff : true}),
+    cP(424, 281, 4, 5, {decallageX : 42, decallageY : 27, cliff : true}),
+    cP(428, 278, 4, 3, {decallageX : 35, decallageY : 24, cliff : true}),
+    cP(432, 273, 4, 5, {decallageX : 25, decallageY : 27, cliff : true}),
+    cP(236, 270, 4, 3, {decallageX : 24, decallageY : 24, cliff : true}),
+    cP(240, 265, 4, 5, {decallageX : 26, decallageY : 27, cliff : true}),
+    cP(444, 262, 4, 3, {decallageX : 24, decallageY : 24, cliff : true}),
+    cP(448, 257, 4, 5, {decallageX : 26, decallageY : 27, cliff : true}),
+    cP(452, 255, 4, 3, {decallageX : 24, decallageY : 24, cliff : true}),
+    cP(456, 250, 4, 4, {decallageX : 26, decallageY : 21, cliff : true}),
+    cP(460, 249, 52, 0, {decallageX : 0, decallageY : 18, cliff : true}),
     //grosse plaque
     cP(384, 96, 32, 32, {lift : true, indice : 12, glove : true}),
     cP(384, 96, 7, 31),
@@ -1233,10 +1341,33 @@ var myBackground = {
     cP(128, 384, 16, 16, {lift : true, indice : 0, destructible : true}),
     cP(128, 400, 16, 16, {lift : true, indice : 0, destructible : true}),
     cP(144, 384, 16, 16, {lift : true, indice : 0, destructible : true}),
+    //item
+    cP(144, 384, 16, 16, {chestContent : function(){
+      myBackground.listeOfSkill[5].opacity = 1;
+      linkEtat.item.glove = 1;
+      linkAction.messageLoading = myBackground.arrayMessage[5];
+      linkAction.textProgress = 1;
+      linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)});
+    }, sword : 1, indice : 13, item : 13, hide : 1, condition: function(){
+      return (linkEtat.item.sword == 1 && !myBackground.collisionListe[myBackground.stage][251].existance());
+    }, }),
     cP(144, 400, 16, 16, {lift : true, indice : 0, destructible : true}),
     cP(176, 384, 16, 16, {lift : true, indice : 0, destructible : true}),
     cP(176, 400, 16, 16, {lift : true, indice : 0, destructible : true}),
     cP(192, 384, 16, 16, {lift : true, indice : 0, destructible : true}),
+    cP(192, 384, 16, 16, {indice : 21, item : 21, hide : 1, condition: function(){
+      return !myBackground.collisionListe[myBackground.stage][256].existance();
+    }, chestContent : function(){
+      myBackground.listeOfSkill[3].opacity = 1;
+        linkEtat.item.heart4 = 1;
+        linkEtat.life[3] = 4;
+        linkEtat.life[2] = 4;
+        linkEtat.life[1] = 4;
+        linkEtat.life[0] = 4;
+        linkAction.messageLoading = myBackground.arrayMessage[8];
+        linkAction.textProgress = 1;
+        linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)})
+      } }),
     cP(192, 400, 16, 16, {lift : true, indice : 0, destructible : true}),
     cP(208, 384, 16, 16, {lift : true, indice : 0, destructible : true}),
     cP(208, 400, 16, 16, {lift : true, indice : 0, destructible : true}),
@@ -1246,19 +1377,381 @@ var myBackground = {
     cP(272, 96, 16, 16, {lift : true, indice : 0, destructible : true}),
     cP(288, 96, 16, 16, {lift : true, indice : 0, destructible : true}),
     //arbre milieu
-    cP(344, 210, 48, 38, {tree : true, decallageX : 1, decallageY : 1, indice : 13, url : '../image/zone/Forest Area 2.2.png'}),
+    cP(344, 210, 48, 38, {tree : true, decallageX : 1, decallageY : 1, indice : 13, url : 'image/Forest Area 2.2.png'}),
     cP(363, 206, 10, 46),
     cP(364, 203, 8, 52),
     cP(366, 202, 4, 54),
     cP(342, 225, 53, 8),
     cP(339, 227, 58, 4),
+    cP(104, 511, 90, 1, {notExit : 1, decallageY : -10}),
     //sortie
     cP(512, 182, 0, 50, {axies : 'left', exit : true, stage : 1, positionX : 0, positionY : true}),//sortie est haut
     cP(512, 248, 0, 96, {axies : 'left', exit : true, stage : 1, positionX : 0, positionY : true}),//sortie est centre
     cP(512, 384, 0, 57, {axies : 'left', exit : true, stage : 1, positionX : 0, positionY : true}),//sortie est bas
     cP(116, 0, 61, 0, {axies : 'top', exit : true, stage : 5, positionX : 140, positionY : 496}),//sortie nord
-  ],[//indice 3
+  ],[//indice 3 chateau
+    cP(704, 214, 9, 25),//contour gauche du souterrain
+    cP(704, 191, 32, 23),//contour haut du souterrain
+    cP(728, 214, 8, 25),//contour droite du souterrain
+    cP(960, 957, 1, 66),
+    cP(952, 950, 8, 8),
+    cP(944, 942, 8, 8),
+    cP(936, 934, 8, 8),
+    cP(928, 926, 8, 8),
+    cP(920, 918, 8, 8),
+    cP(912, 910, 8, 8),
+    cP(560, 735, 352, 175),
+    cP(896, 727, 8, 8),
+    cP(904, 719, 8, 8),
+    cP(912, 711, 8, 8),
+    cP(920, 703, 8, 8),
+    cP(928, 695, 8, 8),
+    cP(936, 646, 1, 49),
+    cP(928, 660, 8, 22),
+    cP(932, 656, 4, 4),
+    cP(932, 682, 4, 4),
+    cP(928, 638, 4, 4),
+    cP(920, 223, 8, 15, {tree : true, decallageX : 1, decallageY : 1, indice : 13, url : 'image/castle-2.png'}),
+    cP(904, 223, 32, 15),
+    cP(936, 207, 24, 16),
+    cP(904, 319, 16, 15),
+    cP(952, 71, 8, 136),
+    cP(848, 77, 105, 1),
+    cP(176, 78, 672, 113),
+    cP(752, 190, 80, 377),
+    cP(736, 359, 112, 136),
+    cP(176, 359, 112, 136),
+    cP(560, 567, 288, 104),
+    cP(463, 591, 98, 64),
+    cP(384, 671, 80, 48),
+    cP(560, 671, 80, 48),
+    cP(617, 601, 80, 65),
+    cP(176, 567, 288, 104),
+    cP(192, 190, 80, 378),
+    cP(456, 735, 7, 159),
+    cP(112, 735, 344, 175),
+    cP(104, 727, 8, 8),
+    cP(96, 719, 8, 8),
+    cP(88, 711, 8, 8),
+    cP(80, 383, 8, 328),
+    cP(32, 895, 8, 31),
+    cP(218, 966, 415, 39),
+    cP(193, 1005, 464, 18),
+    cP(0, 957, 84, 66),
+    cP(0, 951, 81, 48),
+    cP(0, 906, 11, 45),
+    cP(840, 907, 48, 44),
+    cP(836, 928, 56, 8),
+    cP(860, 893, 8, 65),
+    cP(80, 63, 69, 15),
+    cP(80, 63, 69, 15),
+    cP(80, 78, 8, 144),
+    cP(120, 76, 48, 43),
+    cP(116, 96, 57, 8),
+    cP(139, 95, 9, 31),
+    cP(888, 70, 48, 49),
+    cP(894, 96, 56, 8),
+    cP(908, 59, 8, 67),
+    cP(576, 287, 24, 112),
+    cP(632, 328, 48, 47),
+    cP(652, 324, 8, 58),
+    cP(628, 353, 56, 6),
+    cP(736, 271, 16, 15),
+    cP(632, 271, 16, 15),
+    cP(568, 271, 32, 16),
+    cP(536, 271, 16, 32),
+    cP(472, 267, 15, 36),
+    cP(424, 271, 32, 16),
+    cP(360, 271, 32, 16),
+    cP(424, 303, 24, 80),
+    cP(424, 399, 24, 48),
+    cP(424, 463, 24, 48),
+    cP(576, 511, 24, 32),
+    cP(608, 415, 24, 80),
+    cP(680, 415, 24, 80),
+    cP(632, 463, 16, 21),
+    cP(632, 431, 16, 21),
+    cP(664, 431, 16, 21),
+    cP(664, 463, 16, 21),
+    cP(920, 223, 9, 415),
+    cP(336, 399, 16, 21),
+    cP(336, 431, 16, 21),
+    cP(336, 463, 16, 21),
+    cP(336, 495, 16, 21),
+    cP(384, 399, 16, 21),
+    cP(384, 431, 16, 21),
+    cP(384, 463, 16, 21),
+    cP(384, 495, 16, 21),
+    cP(336, 190, 162, 81),
+    cP(552, 188, 136, 83),
+    cP(344, 329, 48, 46),
+    cP(340, 353, 56, 6),
+    cP(364, 326, 8, 56),
+    cP(128, 127, 32, 32, {lift : true, indice : 23, glove : true}),
+    cP(96, 159, 32, 32, {lift : true, indice : 23, glove : true}),
+    cP(100, 165, 16, 16, {hide : true, sword : 1, indice : 11, item : 11,
+      condition: function(){
+        return !myBackground.collisionListe[myBackground.stage][98].existance();
+      }, chestContent : function(){
+        myBackground.listeOfSkill[4].opacity = 1;
+        linkEtat.item.redChainMail = 1;
+        linkEtat.spritePosition.color = 3;
+        linkAction.messageLoading = myBackground.arrayMessage[17];
+        linkAction.textProgress = 1;
+        linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)});
+      }}),
+    cP(48, 911, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(64, 911, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(80, 911, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(96, 927, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(112, 943, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(128, 943, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(144, 943, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(160, 959, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(176, 959, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(176, 976, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 943, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 959, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 943, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 959, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(768, 943, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(784, 959, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(768, 959, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(784, 943, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(896, 943, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(928, 943, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(912, 927, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(896, 911, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(96, 79, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(96, 127, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(112, 127, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(96, 143, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(112, 143, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(160, 447, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(160, 462, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(192, 703, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(208, 703, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(224, 703, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(224, 719, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(208, 719, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(240, 719, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(256, 719, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(272, 719, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(656, 671, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(656, 703, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(656, 687, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 687, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 703, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 703, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(752, 703, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(800, 703, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(816, 703, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(896, 463, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(896, 415, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(896, 367, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(896, 303, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(896, 271, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(864, 271, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(864, 239, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(864, 159, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(928, 191, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(928, 143, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(864, 79, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(880, 191, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(609, 271, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(609, 287, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(864, 289, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(864, 399, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(864, 303, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(816, 687, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(672, 671, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(752, 671, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(768, 671, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(784, 671, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(688, 671, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(672, 687, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(752, 687, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(768, 687, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(288, 223, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(304, 223, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(320, 223, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(288, 239, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(304, 239, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(320, 239, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(416, 511, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(432, 511, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(416, 527, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(432, 527, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(576, 399, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(576, 415, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(576, 431, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(576, 447, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(576, 463, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(576, 479, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(576, 495, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(592, 399, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(592, 415, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(592, 431, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(592, 447, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(592, 463, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(592, 479, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(592, 495, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(608, 399, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(608, 495, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(624, 399, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(624, 495, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(672, 495, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(672, 495, 16, 15, {hide : true, sword : 1, indice : 22, item : 22,
+      condition: function(){
+        return !myBackground.collisionListe[myBackground.stage][200].existance();
+      }, chestContent : function(){
+        myBackground.listeOfSkill[12].opacity = 1;
+        linkEtat.item.heart6 = 1;
+        linkEtat.life[5] = 4;
+        linkEtat.life[4] = 4;
+        linkEtat.life[3] = 4;
+        linkEtat.life[2] = 4;
+        linkEtat.life[1] = 4;
+        linkEtat.life[0] = 4;
+        linkAction.messageLoading = myBackground.arrayMessage[13];
+        linkAction.textProgress = 1;
+        linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)});
+      }}),
+    cP(688, 495, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 495, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 479, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 463, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 447, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 431, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 399, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 527, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(688, 527, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(672, 527, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(688, 399, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(672, 399, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 415, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 495, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 479, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 463, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 447, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 431, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 399, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 415, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(736, 543, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 272, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 303, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 319, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 335, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 351, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 309, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(704, 325, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 272, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 303, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 319, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 335, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 351, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(896, 239, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(896, 239, 16, 15, {hide : true, indice : 14, sword : 1, item : 14,
+      condition: function(){
+        return !myBackground.collisionListe[myBackground.stage][235].existance();
+      }, chestContent : function(){
+        myBackground.listeOfSkill[6].opacity = 1;
+        linkEtat.item.heart5 = 1;
+        linkAction.messageLoading = myBackground.arrayMessage[6];
+        linkEtat.life[4] = 4;
+        linkEtat.life[3] = 4;
+        linkEtat.life[2] = 4;
+        linkEtat.life[1] = 4;
+        linkEtat.life[0] = 4;
+        linkAction.textProgress = 1;
+        linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)});
+      }}),
+    cP(720, 309, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(720, 325, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(736, 207, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(736, 191, 16, 15, {lift : true, indice : 0, destructible : true}),
+    cP(912, 944, 16, 15, {lift : true, indice : 1 , glove : true}),
+    cP(896, 928, 16, 15, {lift : true, indice : 1 , glove : true}),
+    //escalier
+    cP(488, 302, 50, 1, {stairs : true, decallageY : -16}),
+    cP(488, 303, 50, 1, {hide : 1, indice: 24, item: 24, condition: function(){
+      if ( !( linkEtat.key.mongoDB && linkEtat.key.express && linkEtat.key.angular && linkEtat.key.nodeJS ) && linkEtat.collision.position == 244 ) {
+        linkAction.messageLoading = myBackground.arrayMessage[18];
+        linkEtat.collision.position = null;
+      }
+      return ( linkEtat.key.mongoDB && linkEtat.key.express && linkEtat.key.angular && linkEtat.key.nodeJS );
+    }, chestContent : function(){
+      myBackground.collisionListe[myBackground.stage][244].modif(false);
+    }}),
+    cP(487, 287, 50, 1, {stairs : true, decallageY : 16}),
+    //stell à pousser
+    cP(891, 151, 26, 24, {push : 24, decallageY : -10, sauvY : 151}),
+    //pas une sortie
+    cP(78, 1022, 120, 1, {notExit : 1, decallageY : -10 }),
+    //pas une sortie
+    cP(0, 292, 1, 40, {notExit : 1, decallageX : 10 }),
+    cP(79, 221, 1, 164, {notExit : 1, decallageX : 10 }),
+    //porte du chateau
+    cP(496, 270, 32, 1, {axies : 'top', door : true, indice : 26, positionExit : -26}),
+    //porte du principale
+    cP(496, 269, 32, 1, {axies : 'top', door : true, indice : 27, positionExit : -25}),
+    //sortie
+    cP(496, 246, 32, 1, {axies : 'top', exit : 1, stage : 11, positionX : 169, positionY : 432}),//sortie nord
+    cP(704, 214, 32, 1, {axies : 'top', exit : 1, stage : 4, positionX : 92, positionY : 433}),//sortie nord nord est
+    cP(892, 156, 24, 1, {axies : 'top', exit : 1, stage : 4, positionX : 364, positionY : 146, indice : 22, positionExit :  -3, opacity: 0, zindex: 1}),//sortie nord est
+    cP(654, 1022, 306, 1, {axies : 'top', exit : 1, stage : 1, positionX : 329, positionY : 2}),//sortie sud
   ],[//indice 4
+    cP(386, 154, 43, 216, {tree : true, decallageX : 1, decallageY : 1, indice : 13, url : 'image/secret-2.png'}),
+    cP(382, 154, 5, 29),
+    cP(94, 154, 268, 121),
+    cP(362, 274, 19, 1),
+    cP(364, 315, 24, 16),
+    cP(308, 315, 24, 16),
+    cP(308, 275, 8, 40),
+    cP(139, 370, 248, 41),
+    cP(276, 323, 16, 16),
+    cP(115, 306, 162, 66),
+    cP(101, 363, 39, 31),
+    cP(28, 363, 39, 31),
+    cP(68, 356, 7, 30),
+    cP(93, 356, 7, 30),
+    cP(94, 410, 46, 28),
+    cP(28, 410, 46, 28),
+    cP(27, 394, 1, 16),
+    cP(52, 274, 1, 88),
+    cP(53, 131, 21, 145),
+    cP(68, 50, 1, 81),
+    cP(68, 50, 335, 1),
+    cP(403, 50, 1, 56),
+    cP(389, 106, 38, 32),
+    cP(317, 106, 38, 32),
+    cP(356, 100, 7, 30),
+    cP(381, 100, 7, 30),
+    cP(316, 138, 1, 17),
+    cP(99, 82, 242, 23),
+    cP(99, 88, 1, 43),
+    // coffre
+    cP(341, 292, 15, 15, {chest : true, item : 19,
+      chestContent : function(){
+        myBackground.listeOfSkill[10].opacity = 1;
+        linkEtat.key.nodeJS = 1;
+        linkAction.messageLoading = myBackground.arrayMessage[14];
+        linkAction.textProgress = 1;
+        linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)});
+      }}),
+      //pot
+    cP(366, 332, 12, 12, {lift : true, indice : 3, destructible : true}),
+    cP(366, 348, 12, 12, {lift : true, indice : 3, destructible : true}),
+    //escalier
+    cP(363, 130, 18, 1, {stairs : true, decallageY : -35}),
+    cP(363, 100, 18, 1, {stairs : true, decallageY : 35}),
+    cP(75, 356, 18, 1, {stairs : true, decallageY : 35}),
+    cP(75, 386, 18, 1, {stairs : true, decallageY : -35}),
+    cP(74, 147, 20, 1, {stairs : true, decallageY : 120}),
+    cP(74, 261, 20, 1, {stairs : true, decallageY : -120}),
+    //sortie
+    cP(361, 176, 22, 1, {axies : 'top', exit : 1, stage : 3, positionX : 892, positionY : 170}),//sortie est
+    cP(74, 431, 20, 1, {axies : 'top', exit : 1, stage : 3, positionX : 712, positionY : 226})//sortie sud
   ],[//indice 5 foret couloir
     //barrière gauche
     cP(112, 432, 8, 63),
@@ -1334,7 +1827,7 @@ var myBackground = {
     //arbre gauche
     cP(77, 482, 20, 30),
     //arbre milieu
-    cP(104, 194, 48, 38, {tree : true, decallageX : 1, decallageY : 1, indice : 13, url : '../image/zone/Forest Entrance 1-2.png'}),
+    cP(104, 194, 48, 38, {tree : true, decallageX : 1, decallageY : 1, indice : 13, url : 'image/Forest Entrance 1-2.png'}),
     //buisson
     cP(96, 128, 16, 15, {lift : true, indice : 0, destructible : true}),
     cP(128, 240, 16, 15, {lift : true, indice : 0, destructible : true}),
@@ -1415,7 +1908,15 @@ var myBackground = {
     cP(154, 162, 8, 8),
     cP(146, 170, 8, 6),
     cP(122, 176, 24, 32),
-    cP(94, 176, 33, 1,{bomb : true, indice : 21, positionX : 94, positionY : 179}),//zone destructible
+    cP(124, 40, 16, 16, {chest : true, item : 20,
+      chestContent : function(){
+        myBackground.listeOfSkill[11].opacity = 1;
+        linkEtat.item.bow = 1;
+        linkAction.messageLoading = myBackground.arrayMessage[10];
+        linkAction.textProgress = 1;
+        linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)});
+      }}), /* coffre */
+    // cP(94, 176, 33, 1,{bomb : true, indice : 21, positionX : 94, positionY : 179}),//zone destructible
     cP(78, 176, 22, 32),
     cP(70, 170, 8, 6),
     cP(62, 162, 8, 8),
@@ -1446,12 +1947,17 @@ var myBackground = {
     cP(32, 38, 6, 8),
     cP(38, 32, 8, 6),
     //coffre
-    cP(48, 64, 16, 16, {chest : true, item : 20, chestContent : function(){linkEtat.item.bow = true;}}),
+    cP(48, 64, 16, 16, {chest : true, item : 18, chestContent : function(){
+      myBackground.listeOfSkill[9].opacity = 1;
+      linkEtat.key.angular = 1;
+      linkAction.messageLoading = myBackground.arrayMessage[12];
+      linkAction.textProgress = 1;
+      myBackground.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)})}}),
     //sortie
     cP(69, 0, 22, 1, {axies : 'top', exit : true, stage : 8, positionX : 103, positionY : 180}),
   ],[//indice 10 zone épée
     //bord feuillage
-    cP(60, 486, 60, 26, {tree : true, decallageX : 1, decallageY : 1, indice : 13, url : '../image/zone/Master_Sword_Pedestal_Area_2.png'}),
+    cP(60, 486, 60, 26, {tree : true, decallageX : 1, decallageY : 1, indice : 13, url : 'image/Master_Sword_Pedestal_Area_2.png'}),
     cP(22, 472, 38, 14),
     cP(22, 472, 38, 14),
     cP(22, 423, 1, 49),
@@ -1548,31 +2054,69 @@ var myBackground = {
     cP(105, 162, 30, 2),
     cP(104, 136, 8, 26),
     cP(128, 136, 8, 26),
-    cP(112, 145, 16, 1, {treasure : true, item : 15, chestContent : function(){linkEtat.item.sword = true;}}),
+    cP(112, 145, 16, 16, {treasure : true, item : 15, chestContent : function(){
+      myBackground.listeOfSkill[2].opacity = 1;
+      linkEtat.item.sword = true;
+      linkAction.walk = 1;
+      linkAction.messageLoading = myBackground.arrayMessage[4];
+      linkAction.textProgress = 1;
+      linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)});
+    }}),
     //escalier
     cP(88, 201, 64, 1, {stairs : true, decallageY : 15}),
     cP(88, 215, 64, 1, {stairs : true, decallageY : -15}),
     //sortie sud
     cP(121, 511, 33, 1, {axies : 'top', exit : true, stage : 5, positionX : 88, positionY : 24}),
+  ],[//indice 11
+    cP(129, 445, 38, 25),
+    cP(187, 445, 38, 25),
+    cP(80, 341, 50, 104),
+    cP(224, 341, 50, 104),
+    cP(81, 78, 1, 263),
+    cP(81, 54, 86, 24),
+    cP(187, 54, 86, 24),
+    cP(272, 78, 1, 263),
+    cP(233, 77, 7, 88),
+    cP(113, 77, 7, 88),
+    cP(153, 150, 8, 16),
+    cP(193, 150, 8, 16),
+    cP(113, 158, 48, 8),
+    cP(193, 158, 48, 8),
+    cP(121, 146, 16, 13),
+    cP(217, 146, 16, 13),
+    cP(97, 198, 48, 24),
+    cP(97, 238, 48, 24),
+    cP(97, 278, 48, 24),
+    cP(209, 198, 48, 24),
+    cP(209, 238, 48, 24),
+    cP(209, 278, 48, 24),
+    cP(169, 98, 16, 16, {treasure : true, item : 25, chestContent : function(){
+      linkAction.messageLoading = myBackground.arrayMessage[15];
+      linkAction.textProgress = 1;
+      myBackground.divWin.opacity = 0.3;
+      linkAction.requestIDMessage = window.requestAnimationFrame(function(timestamp){linkAction.message(timestamp)});
+    }}),
+    //sortie
+    cP(167, 462, 20, 1, {axies : 'top', exit : true, stage : 3, positionX : 504, positionY : 272}), //sortie sud
   ]],
   //liste des background
-  backgroundListe : ['../image/home/Link_House.png','../image/zone/Links House Area 2.png','../image/zone/Forest Area 2.png','','','../image/zone/Forest Entrance 1.png','../image/zone/Master Sword Pedestal Area.png','../image/zone/grotte_premiere_partie.png','../image/zone/grotte_seconde_partie.png','../image/zone/grotte_troisieme_partie.png','../image/zone/Master Sword Pedestal Area.png'],
+  backgroundListe : ['image/Link_House.png','image/Links House Area 2.png','image/Forest Area 2.png','image/castle.png','image/secret.png','image/Forest Entrance 1.png','image/Master Sword Pedestal Area.png','image/grotte_premiere_partie.png','image/grotte_seconde_partie.png','image/grotte_troisieme_partie.png','image/Master Sword Pedestal Area.png','image/chapel.png','image/final.png'],
   //objet du décor interactif
   decorObject : [
     cP(-396, -129, 16, 16), //indice 0 emplacement buissont
     cP(-434, -128, 16, 16), //indice 1 emplacement pierre
     cP(-434, -128, 16, 16), //indice 2 emplacement pierre foncé
-    cP(-379, -147, 16, 16), //indice 3 emplacement pot
+    cP(-381, -148, 12, 12), //indice 3 emplacement pot
     cP(-400, -148, 14, 14), //indice 4 coffre ouvert
     cP(-224, -521, 32, 7), //indice 5 partie supérieur de la sortie
     cP(-224, -535, 32, 10), //indice 6 partie supérieur de l'entré des maison'
     cP(-224, -535, 32, 31), //indice 7 porte ouverte'
-    cP(-106, -535, 96, 50), //indice 8 maison
+    cP(-106, -535, 96, 80), //indice 8 maison
     cP(-340, -146, 7, 8), //indice 9 fleur descente
     cP(-358, -146, 7, 8), //indice 10 fleur basse
     cP(-349, -146, 7, 8), //indice 11 fleur haute
     cP(-220, -221, 30, 31), //indice 12 passage secret
-    cP(-1, -1, 512, 512), //indice 13 arbre
+    cP(-1, -1, 1024, 1024), //indice 13 arbre
     cP(-256, -222, 16, 18), //indice 14 grand flambo flamme basse
     cP(-276, -222, 16, 18), //indice 15 grand flambo flamme milieu
     cP(-298, -222, 16, 18), //indice 16 grand flambo flamme haute
@@ -1581,6 +2125,13 @@ var myBackground = {
     cP(-357, -230, 16, 16), //indice 19 petit flambo flamme milieu
     cP(-376, -230, 16, 16), //indice 20 petit flambo flamme haute
     cP(-184, -217, 33, 40), //indice 21 ouverture grotte
+    cP(-60, -546, 24, 22), //indice 22 soutérrain
+    cP(-263, -159, 32, 32), //indice 23 emplacement de gros roché
+    cP(-59, -521, 26, 24), //indice 24 stell
+    cP(-13, -566, 32, 11), //indice 25 haut de porte du chateau
+    cP(-13, -583, 32, 24), //indice 26 porte du chateau entrain de s'ouvrir
+    cP(-56, -583, 32, 24), //indice 27 porte du chateau ouverte
+    cP(-13, -543, 32, 17), //indice 28 haut de souterrain du chateau
   ],
   //objet animé
   objetAnime : [[/* pas d'objet animé dans le stage 0 */
@@ -1672,8 +2223,23 @@ var myBackground = {
       cP(57, 88, 7, 8, {animation : 9}),
       cP(81, 240, 7, 8, {animation : 9}),
       cP(177, 336, 7, 8, {animation : 9})
+    ],[//indice 11
+      //grande flamme
+      cP(121, 126, 16, 18, {animation : 14}),
+      cP(126, 126, 16, 18, {animation : 14}),
+    ],[//indice 12
     ]
     ],
+  circle : [//arrivé dans une zone et game over (à l'enver)
+    cP(-2,0,257,223),
+    cP(-265,-1,256,223),
+    cP(-2,-231,256,223),
+    cP(-265,-230,256,223),
+    cP(-2,-459,256,223),
+    cP(-265,-459,256,223),
+    cP(-3,-692,256,223),
+    cP(-267,-692,256,223),
+  ],
   image : [],
   div : [],
   save : [],
@@ -1721,21 +2287,36 @@ var myBackground = {
   enemiesStage : [[//indice 0 pas d'ennemi
     ],[//indice 1 zone de la maison
       cP(354, 385, 16, 16, cE1(4,cP(354, 385, 16, 16),cP(329, 117, 50, 200)) ),
-      cP(320, 89, 16, 16, cE1(4,cP(320, 89, 16, 16),cP(200, 20, 200, 100)) ),
+      cP(320, 89, 16, 16, cE1(4,cP(320, 89, 16, 16),cP(200, 20, 150, 80)) ),
       cP(77, 394, 16, 16, cE1(4,cP(77, 394, 16, 16),cP(25, 385, 200, 25)) ),
     ],[//indice 2 foret
-    ],[//indice 3 foret
+      cP(110, 50, 16, 16, cE1(4,cP(110, 50 , 16, 16),cP(93, 39, 93, 71)) ),
+      cP(125, 440, 16, 16, cE1(0,cP(125, 440, 16, 16),cP(97, 416, 92, 33)) ),
+      cP(350, 160, 16, 16, cE1(0,cP(350, 160, 16, 16),cP(318, 144, 109, 35)) ),
+    ],[//indice 3 chateau
+      cP(290, 285, 16, 16, cE1(4,cP(290, 285, 16, 16),cP(272, 277, 52, 70)) ),
+      cP(457, 360, 16, 16, cE1(4,cP(457, 360, 16, 16),cP(457, 338, 94, 213)) ),
+      cP(540, 515, 16, 16, cE1(4,cP(540, 515, 16, 16),cP(457, 338, 94, 213 )) ),
+      cP(610, 520, 16, 16, cE1(4,cP(610, 520, 16, 16),cP(600, 511, 56, 39 )) ),
+      cP(849, 335, 16, 16, cE0(1,cP(849, 335, 16, 16),cP(849,335,31,364))),
+      cP(880, 669, 16, 16, cE0(1,cP(880, 669, 16, 16),cP(849,335,31,364))),
+      cP(88, 221, 16, 16, cE0(1,cP(88, 221, 16, 16),cP(88,221,39,471))),
+      cP(125, 690, 16, 16, cE0(1,cP(125, 690, 16, 16),cP(88,221,39,471))),
     ],[//indice 4
     ],[//indice 5 foret couloir
-      cP(116, 108, 16, 16, cE0(0,cP(116, 108, 16, 16),cP(0,0,0,0)) ),
-      cP(77, 201, 16, 16, cE0(0,cP(116, 108, 16, 16),cP(0,0,0,0)) ),
-      cP(141, 357, 16, 16, cE0(0,cP(116, 108, 16, 16),cP(0,0,0,0)) )
+      cP(116, 108, 16, 16, cE0(0,cP(116, 108, 16, 16),cP(88,99,40,73))),
+      cP(79, 176, 16, 16, cE0(0,cP(79, 176, 16, 16),cP(77,44,73,36)) ),
+      cP(141, 357, 16, 16, cE0(0,cP(141, 357, 16, 16),cP(125,329,22,71)) )
     ],[//indice 6
     ],[//indice 7
     ],[//indice 8
     ],[//indice 9
     ],[//indice 10 pas d'ennemi
     ],[//indice 11
-    ],[]
-  ]
+    ],[//indice 12
+
+    ]
+  ],
+  //liste des messages.
+  arrayMessage : ['J\'ai perdu mes competences. Aidez moi a les trouver. Vous pouvez egalement voir directement mon CV en cliquant sur le lien en haut.','Il me manque une competence dans la piece. Trouvez la avant de continuer.','Vous avez trouve HTML5.','Vous avez trouve CSS.','Yes! Vous avez retrouve javascript. Je vais pouvoir me battre contre les ennemis','Vous avez trouve JQuery. Je peux maintenant soulever les objets lourds.','Vous avez trouve JQuery UI','Vous avez trouve MongoDB. Il s\'agit de la première des 4 cles qui vous serviront à aller dans la zone finale.','Vous avez trouve Bootstrap','Vous avez trouve Express. La seconde cle pour acceder à la zone finale.','Vous avez trouve Meteor. Vous pouvez maintenant utiliser l\'arc.','Vous avez trouve PhotoShop.','Vous avez trouve Angular. La troisième cle de la zone finale.','Vous avez trouve Ajax.','Vous avez trouve Node. La derniere cle pour acceder a la zone finale.','Bravo vous avez trouve toutes mes competences. Vous pouvez voir mon CV ou rejouer en appuyant sur Entree','La zone est trop dangereuse.','Vous avez trouve PhotoShop.','Vous n\'avez pas encore toutes les clees pour entrer'],
 };
