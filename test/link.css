@@ -1,0 +1,20 @@
+#view{
+  position: absolute;
+  top :15%;
+  left :30%;
+}
+#show{
+  position: relative;
+}
+#limitePersonnage, #objet, #spriteLink, #spriteObjet, #showSkill, #skill{
+  position: absolute;
+}
+#objet, #carac, #skill{
+}
+#showSkill{
+}
+
+/*#skill{
+  width: 16px;
+  height: 17px;
+}*/
